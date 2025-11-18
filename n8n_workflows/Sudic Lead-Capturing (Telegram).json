@@ -1,0 +1,518 @@
+{
+  "name": "Sudic Lead-Capturing (Telegram)",
+  "nodes": [
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to search the internet",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"api_key\": \"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\",\n    \"query\": \"{searchTerm}\",\n    \"search_depth\": \"basic\",\n    \"include_answer\": true,\n    \"topic\": \"news\",\n    \"include_raw_content\": true,\n    \"max_results\": 3\n} ",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "searchTerm",
+              "description": "What the user has requested to search the internet for",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        560
+      ],
+      "id": "35eeb6d0-25db-4206-8a95-0f2e54fbe0ef",
+      "name": "Tavily"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        560
+      ],
+      "id": "89d43dfc-8a91-4b7c-9874-374931d011cd",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "content": "# Parent Agent\n\n",
+        "height": 260,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -928,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "6efb588d-4c0e-442d-97fb-7e2d9cb7416a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        192,
+        560
+      ],
+      "id": "b0eec616-a306-481f-ab23-879747960658",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "content": "# Think\n",
+        "height": 200,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        96,
+        496
+      ],
+      "id": "d564433d-b66f-4969-bcbb-e9343422a42b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "cd684f3c-216e-42fe-b454-dc7a4be1cdc9",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1488,
+        96
+      ],
+      "webhookId": "82682267-d51e-4370-b383-9f4e0c992150",
+      "credentials": {
+        "telegramApi": {
+          "id": "dm5Vz2WJ6Logh48j",
+          "name": "Telegram SudicIaloveni_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe7ecc99-e1e8-4a5e-bdd6-6fce9757b234",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "920c315a-1232-4f54-8917-4ad66fc9153c",
+              "name": "Chat ID",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "9d427d5b-c6e2-41ca-b765-03fa706184ab",
+              "name": "First Name",
+              "value": "={{ $json.message.chat.first_name }}",
+              "type": "string"
+            },
+            {
+              "id": "97b2500e-f4f6-4894-93ed-5871ac1e0937",
+              "name": "User Is a Bot",
+              "value": "={{ $json.message.from.is_bot }}",
+              "type": "boolean"
+            },
+            {
+              "id": "563e4d4c-24db-415a-92c5-b80c2834e93a",
+              "name": "Current Date and Time",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "46918817-ae06-4d61-9601-9edc2987baea",
+      "name": "Set 'Text'",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1200,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "dfdfbdd3-1eaf-408d-8fd7-80896adba59d",
+      "name": "Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -304,
+        112
+      ],
+      "webhookId": "d3eb3f06-0eed-497f-affd-eb73f04ab130",
+      "credentials": {
+        "telegramApi": {
+          "id": "dm5Vz2WJ6Logh48j",
+          "name": "Telegram SudicIaloveni_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1280,
+        544
+      ],
+      "id": "2d1b6acb-01cb-40d0-a738-9765d4627e0b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "kVmOf8HT5KkyFew9",
+          "name": "Tariti Mass Autonomation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Tools\n",
+        "height": 200,
+        "width": 432,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        496
+      ],
+      "id": "48c5aff3-a260-41b8-abd6-181ea96726ea",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# AI Basics\n",
+        "height": 200,
+        "width": 464,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1472,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "177e722a-6046-4ebc-bfc6-68711fbbb7b1",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to send the documents.\nYou must provide the Telegram ChatID.\nYou must provide the complex number:\n1 for SUDIC1\n2 for SUDIC2\n\nWhen you use this tool, it sends all the documents in the chat. You don't need to provide the client with any link.",
+        "workflowId": {
+          "__rl": true,
+          "value": "QVdrMKl9fqVCOlG1",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/QVdrMKl9fqVCOlG1",
+          "cachedResultName": "Send Sudic Files"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Telegram_ChatID": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Telegram_ChatID', ``, 'number') }}",
+            "Complex": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Complex', ``, 'number') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Telegram_ChatID",
+              "displayName": "Telegram_ChatID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "Complex",
+              "displayName": "Complex",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -736,
+        544
+      ],
+      "id": "e1fae46f-7bb0-4dd4-83a7-37963512795e",
+      "name": "Send Sudic Files"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to create a new To-Do entry in AmoCRM, scheduled for tomorrow, so an agent can call the client.\nYou should call this tool after you’ve gathered all the important information from the client during the conversation.\n\nThe Title (Entry Name) must follow this exact format:\n\n<Full Client Name> + <Client Phone Number> + <Platform where the conversation took place> + <What the client is interested in> + <Relevant notes or context>\n\nAI Guidance:\n\nOnly use this tool once per new client conversation, right after the client confirms interest or provides the necessary details.\n\nYou can infer “Platform” from context (for example, “Telegram”, “Viber”, etc.).\n\nThe “What they are interested in” and “Relevant notes” fields should be short and descriptive.\nExamples:\n\nIon Popescu + 01234567 + Telegram + Interested in Sudic Ialoveni + Wants to schedule a viewing\n\nElena Smirnova + 09876543 + Viber + Sudic Apartments + Asked for price list\n\nYou do not need to specify the date or time, the tool automatically sets it for tomorrow.",
+        "workflowId": {
+          "__rl": true,
+          "value": "JLXHWNTE0tSKNNdZ",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JLXHWNTE0tSKNNdZ",
+          "cachedResultName": "Sudic Create AmoCRM Entry"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Entry Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Entry_Name', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Entry Name"
+          ],
+          "schema": [
+            {
+              "id": "Entry Name",
+              "displayName": "Entry Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -576,
+        544
+      ],
+      "id": "6d56c4c1-1b61-43b6-962a-bad7e6226366",
+      "name": "Sudic Create AmoCRM Entry"
+    },
+    {
+      "parameters": {
+        "content": "# Children\n## Sub-Workflows\n",
+        "height": 200,
+        "width": 528,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "02a3dcd5-19cc-4a9d-bddc-2191e0f3c22d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "={{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are the official virtual assistant of **Sudic Ialoveni**, a construction and real estate company developing modern apartment complexes in Ialoveni, Moldova.\n\nYou speak naturally and professionally in the client’s language (Romanian, Russian, or English). Always adapt to the client’s tone — polite, warm, and human. Never sound like a robot.\n\n---\n\n### 🏗️ About Sudic Ialoveni\nSudic Ialoveni develops two modern residential complexes: **SUDIC 1** and **SUDIC 2**.\n\n**SUDIC 1**\n- 7 blocks, 200 apartments, ~70% completed  \n- Construction started: June 2023 — Estimated completion: 2026  \n- Designed by AVV Architects, inspired by European-style housing  \n- 4-story buildings with silent elevators and 2.9 m ceilings  \n- Over 1.04 hectares of land with 3 children’s playgrounds, underground and aboveground parking  \n- Excellent thermal insulation (polystyrene), LOW-E windows  \n- Safe inner courtyard ideal for families  \n- Nearby: Linella supermarket, pharmacies, restaurants, health center, and other local stores  \n- Location: Str. Suceava 5, MD-6801, Ialoveni  \n- Website: https://sudic.md/index.php/\n\n**SUDIC 2**\n- 1 block, 39 apartments, ~10% completed  \n- Construction started: August 2025 — Estimated completion: March 2027  \n- Developed by Eurostil Construct (20+ years experience, 100,000+ m² built)  \n- Basement + Ground floor + 5 floors + recessed floor (8 levels total)  \n- Central location on Alexandru cel Bun street  \n- Commercial spaces on the ground floor for cafes, shops, and services  \n- Thermal insulation with mineral wool, LOW-E windows, parking, and playground  \n- Nearby: Ialoveni Winery, Linella supermarket, pharmacies, and other stores  \n- Location: Str. Traian 16, Ialoveni, Moldova  \n- Website: https://sudic.md/index.php/sudic-2\n\n---\n\n### 🎯 Your Role and Goals\nYou represent Sudic Ialoveni online and respond to people who message our Telegram page.\n\nYour goals:\n1. **Greet and introduce Sudic Ialoveni** naturally and professionally.  \n2. **Share visual materials** (photos, floor plans, or YouTube links — provided separately).  \n3. **Engage in small talk** to build trust and interest.  \n4. **Collect essential information** from the client: first name, last name, phone number, and any additional relevant details (like preferred contact time or project interest).  \n5. **Politely propose a phone call** with a representative.  \n6. Once all info is collected, **confirm the data and close the conversation warmly**, thanking them for their interest.\n\n---\n\n### 💬 Conversation Guidelines\n- Write short, natural messages — not robotic or overly long.  \n- Always continue the conversation smoothly based on what the user says.  \n- Avoid repeating information or sounding scripted.  \n- Do not ask for all details at once; gather them naturally over multiple messages.  \n- When possible, mention SUDIC1 or SUDIC2 if the client refers to one of them.  \n- If the user asks for details, you can explain features, benefits, and progress of each complex based on the information above.  \n- Never invent new information about Sudic; use only verified details.\n\n---\n\n**The client’s first name is:** {{ $json[\"First Name\"] }}  \n**The chat ID is:** {{ $json[\"Chat ID\"] }}  \n**The current date and time is:** {{ $json[\"Current Date and Time\"] }}\n\n---\n\nKeep the tone friendly, informative, and confident — you are the face of Sudic Ialoveni online.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -848,
+        96
+      ],
+      "id": "363a9896-46ee-4233-8f93-6dc311c19605",
+      "name": "Lead-Capturing AI",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1120,
+        544
+      ],
+      "id": "2564005f-c136-414f-bb5a-f3f581d0ebde",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Lead-Capturing AI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "Lead-Capturing AI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set 'Text'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set 'Text'": {
+      "main": [
+        [
+          {
+            "node": "Lead-Capturing AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Lead-Capturing AI",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Sudic Files": {
+      "ai_tool": [
+        [
+          {
+            "node": "Lead-Capturing AI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sudic Create AmoCRM Entry": {
+      "ai_tool": [
+        [
+          {
+            "node": "Lead-Capturing AI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead-Capturing AI": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Lead-Capturing AI",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "3422d83e-f247-4a6a-8396-d71532e36042",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "207796555c538008e612d32a818bf5cfe856872d10b75a11dc15781656a3929c"
+  },
+  "id": "aM5IPLUZpSw4VRvz",
+  "tags": [
+    {
+      "createdAt": "2025-10-07T20:52:15.541Z",
+      "updatedAt": "2025-10-07T20:52:15.541Z",
+      "id": "BKuq9KxnXEbK7hzb",
+      "name": "Tested - Working"
+    },
+    {
+      "createdAt": "2025-11-02T11:44:01.975Z",
+      "updatedAt": "2025-11-02T11:44:01.975Z",
+      "id": "CFIRsCZ4wcdRFXva",
+      "name": "Sudic"
+    }
+  ]
+}

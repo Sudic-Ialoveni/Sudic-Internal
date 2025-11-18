@@ -1,0 +1,851 @@
+{
+  "name": "Drive Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "id": "8c305062-e116-42d3-9555-742582fc908b",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        320
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "wQkGdx4XmPN63V1S",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ab380a2-a8d3-421c-ab4e-748ea8fb7904",
+              "name": "response",
+              "value": "Unable to perform task. Please try again.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bec70c99-f525-450d-9f29-e6e4a3471052",
+      "name": "Try Again",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "39c2f302-03be-4464-a17a-d7cc481d6d44",
+              "name": "=response",
+              "value": "={{$json.output}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9574b074-1d77-4a7c-9c50-356f43e6db2a",
+      "name": "Success",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        -128
+      ],
+      "id": "af7801fd-6863-4396-977c-0c98e5d8a389",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "6881182990"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -576,
+        320
+      ],
+      "id": "7b37f035-4d33-4cac-90c2-924ed1d5f734",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -496,
+        64
+      ],
+      "id": "008ee319-2660-490a-affe-91901d1e5b58",
+      "name": "When chat message received",
+      "webhookId": "bbc18de8-9001-48f4-9f4e-421b70dcaa16"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', ``, 'string') }}",
+          "mode": "id"
+        },
+        "sameFolder": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Copy_In_The_Same_Folder', ``, 'boolean') }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        -272,
+        320
+      ],
+      "id": "6d03f29d-70d1-4409-ac31-b23537c96d5c",
+      "name": "Copy file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ $fromAI('File_Content', ``, 'string') }}",
+        "driveId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Drive', ``, 'string') }}",
+          "mode": "id"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Folder', ``, 'string') }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        -144,
+        320
+      ],
+      "id": "a4c158eb-e92c-4557-951e-c62c6f78dc1d",
+      "name": "Create file from text in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', ``, 'string') }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        -16,
+        320
+      ],
+      "id": "7341d5bd-58b3-4626-a9c0-c0370a820793",
+      "name": "Delete a file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', `You MUST provide the File ID Here!`, 'string') }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Put_Output_File_in_Field', ``, 'string') }}",
+          "fileName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File_Name', `You can provide the filename here.`, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        112,
+        320
+      ],
+      "id": "4c837187-737e-4b69-a056-eae1094a9913",
+      "name": "Download file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $fromAI('File', ``, 'string') }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Drive', ``, 'string') }}"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Folder', ``, 'string') }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        240,
+        320
+      ],
+      "id": "7b133e2a-af6b-4abb-911e-968dafe3f3b7",
+      "name": "Move file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutGoogleDrive": "",
+        "descriptionType": "auto",
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', ``, 'string') }}",
+          "mode": "id"
+        },
+        "permissionsUi": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        368,
+        320
+      ],
+      "id": "bb32fe67-c8e8-4cad-9457-7280466b65a5",
+      "name": "Share file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        496,
+        320
+      ],
+      "id": "0864d408-b969-433a-938c-7e79a6616d45",
+      "name": "Upload file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search_Query', ``, 'string') }}",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        624,
+        320
+      ],
+      "id": "869b8e09-fb59-4356-b99c-1e4fab614c32",
+      "name": "Search files and folders in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "driveId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Drive', ``, 'string') }}",
+          "mode": "id"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Folder', ``, 'string') }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        64,
+        512
+      ],
+      "id": "4295f0b0-63d1-40bf-b2ec-bcaa805e76e8",
+      "name": "Create folder in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "deleteFolder",
+        "folderNoRootId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Folder', ``, 'string') }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        192,
+        512
+      ],
+      "id": "0d9fb7fb-31a9-4082-8080-8090555eba66",
+      "name": "Delete folder in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutGoogleDrive": "",
+        "descriptionType": "auto",
+        "authentication": "oAuth2",
+        "resource": "folder",
+        "operation": "share",
+        "folderNoRootId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Folder', ``, 'string') }}",
+          "mode": "id"
+        },
+        "permissionsUi": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        320,
+        512
+      ],
+      "id": "afb75c5a-4b2a-4bc5-8cf3-69e32790a535",
+      "name": "Share folder in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "drive",
+        "name": "={{ $fromAI('Name', `The name of the Shared Drive`, 'string', '') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        -64,
+        704
+      ],
+      "id": "14255a46-90cd-4cb2-9bbf-cf83e38932d6",
+      "name": "Create shared drive in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "drive",
+        "operation": "deleteDrive",
+        "driveId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Shared_Drive', ``, 'string') }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        64,
+        704
+      ],
+      "id": "3e5d9640-e292-4bf2-bd0b-4cc7a49440be",
+      "name": "Delete shared drive in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "drive",
+        "operation": "get",
+        "driveId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Shared_Drive', ``, 'string') }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        192,
+        704
+      ],
+      "id": "b596fa15-e714-41c0-9740-7be009a6ba6b",
+      "name": "Get shared drive in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "drive",
+        "operation": "list",
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        320,
+        704
+      ],
+      "id": "0b109b71-4ef5-4e44-af0f-74256ee26320",
+      "name": "Get many shared drives in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "drive",
+        "operation": "update",
+        "driveId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Shared_Drive', ``, 'string') }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        448,
+        704
+      ],
+      "id": "607afe00-4d4e-4842-a12d-957c8716f77e",
+      "name": "Update shared drive in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "oX4231oNFlizdMmi",
+          "name": "Teo Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an email management assistant. All emails must be formatted professionally in HTML and signed off as \"Nate.\" \n\n**Email Management Tools**   \n   - Use \"Send Email\" to send emails.  \n   - Use \"Create Draft\" if the user asks for a draft.  \n   - Use \"Get Emails\" to retrieve emails when requested.\n   - Use \"Get Labels\" to retrieve labels.\n   - Use \"Mark Unread\" to mark an email as unread. You must use \"Get Emails\" first so you have the message ID of the email to flag.\n   - Use \"Label Email\" to flag an email. You must use \"Get Emails\" first so you have the message ID of the email to flag. Then you must use \"Get Labels\" so you have the label ID.\n   - Use \"Email Reply\" to reply to an email. You must use \"Get Emails\" first so you have the message ID of the email to reply to.\n\n## Final Notes\n- Here is the current date/time: {{ $now }}"
+        }
+      },
+      "id": "b7478ea0-eadd-4890-bff8-50dbce5ace93",
+      "name": "Drive Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        48,
+        80
+      ],
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create file from text in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete folder in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share folder in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create shared drive in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete shared drive in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get shared drive in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many shared drives in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update shared drive in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Drive Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Drive Agent": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Try Again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9f8cea59-61ab-4bb3-b325-6ac32036ea0b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "207796555c538008e612d32a818bf5cfe856872d10b75a11dc15781656a3929c"
+  },
+  "id": "KWSRrfafH7SS9zjA",
+  "tags": [
+    {
+      "createdAt": "2025-10-07T20:52:21.214Z",
+      "updatedAt": "2025-10-07T20:52:21.214Z",
+      "id": "0PrlaC9AeEYuNOT9",
+      "name": "Has Issues"
+    },
+    {
+      "createdAt": "2025-10-07T18:48:37.058Z",
+      "updatedAt": "2025-10-07T18:48:37.058Z",
+      "id": "AJkMvsLrqBrypL0S",
+      "name": "Agent"
+    },
+    {
+      "createdAt": "2025-10-07T18:30:54.933Z",
+      "updatedAt": "2025-10-07T18:30:54.933Z",
+      "id": "C8qcujxxgQ2vmWXv",
+      "name": "TaritiGPT"
+    },
+    {
+      "createdAt": "2025-10-07T20:52:36.983Z",
+      "updatedAt": "2025-10-07T20:52:36.983Z",
+      "id": "riVDoKpJDdownhSU",
+      "name": "Incomplete"
+    }
+  ]
+}

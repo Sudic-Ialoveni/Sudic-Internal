@@ -1,0 +1,201 @@
+{
+  "name": "Sudic Create AmoCRM Entry",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Entry Name"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -576,
+        -112
+      ],
+      "id": "b8786884-adf0-4fc9-b686-fc1e9382eae0",
+      "name": "When Executed by Another Workflow",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "tasks",
+        "operation": "createTasks",
+        "collection": {
+          "task": [
+            {
+              "text": "={{ $json['Entry Name'] }}",
+              "complete_till": "={{ $json.Tomorrow }}",
+              "responsible_user_id": 6711829,
+              "duration": 100,
+              "resultText": "",
+              "created_by": 6711829
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -112
+      ],
+      "id": "3b1e0a90-9c6d-4484-9ad8-d9e14e487369",
+      "name": "Create new tasks",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "AHCdd15AiEh4pDHo",
+          "name": "Amocrm PROD Tariti Ialoveni"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "94731f1d-1c41-4e4e-921a-093e864dcd3b",
+              "name": "Tomorrow",
+              "value": "={{ $json.Tomorrow }}",
+              "type": "string"
+            },
+            {
+              "id": "81e477d8-51d1-4503-93eb-66c6b5a5fce7",
+              "name": "Entry Name",
+              "value": "={{ $node[\"When Executed by Another Workflow\"].json[\"Entry Name\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        96,
+        -112
+      ],
+      "id": "1d490ea0-f0ca-4453-b637-e01b5240b1e7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        -112
+      ],
+      "id": "428298e1-5bdb-4275-a37f-6265fcf91274",
+      "name": "Get Date&Time"
+    },
+    {
+      "parameters": {
+        "operation": "addToDate",
+        "magnitude": "={{ $json.currentDate }}",
+        "duration": 1,
+        "outputFieldName": "Tomorrow",
+        "options": {
+          "includeInputFields": false
+        }
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        -112
+      ],
+      "id": "69d5948c-8c7b-4206-a84c-ca3ecc231904",
+      "name": "Tomorrow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Date&Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create new tasks": {
+      "main": [
+        []
+      ]
+    },
+    "Get Date&Time": {
+      "main": [
+        [
+          {
+            "node": "Tomorrow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tomorrow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create new tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a7749ee8-61e6-4d69-9431-55e6812d6bc5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "207796555c538008e612d32a818bf5cfe856872d10b75a11dc15781656a3929c"
+  },
+  "id": "JLXHWNTE0tSKNNdZ",
+  "tags": [
+    {
+      "createdAt": "2025-10-07T20:52:15.541Z",
+      "updatedAt": "2025-10-07T20:52:15.541Z",
+      "id": "BKuq9KxnXEbK7hzb",
+      "name": "Tested - Working"
+    },
+    {
+      "createdAt": "2025-11-02T11:44:01.975Z",
+      "updatedAt": "2025-11-02T11:44:01.975Z",
+      "id": "CFIRsCZ4wcdRFXva",
+      "name": "Sudic"
+    },
+    {
+      "createdAt": "2025-10-07T21:56:14.583Z",
+      "updatedAt": "2025-10-07T21:56:14.583Z",
+      "id": "wIhePW2VeZs9gdVU",
+      "name": "IN PROD"
+    }
+  ]
+}

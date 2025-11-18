@@ -1,0 +1,413 @@
+{
+  "name": "Contact Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1248,
+        160
+      ],
+      "id": "48805a8e-989d-4a63-8b73-86fcef0d686d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wQkGdx4XmPN63V1S",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are a contact management assistant. Your responsibilities include looking up contacts, adding new contacts, or updating a contact's information.\n\n**Contact Management**  \n   - Use \"Get Contacts with Query\" to retrieve contact information using a search query. \n   - Use \"Create Contact\" to store new contact information or modify existing entries. \n   - Use \"Delete Contact\" delete contacts using the Contact ID.\n   - Contact Modification is not available yet!"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -992,
+        -48
+      ],
+      "id": "923d784c-c668-408b-9be3-da27a5dcd3ab",
+      "name": "Contact Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4f360190-a717-4a93-8336-d03ea65975d5",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -464,
+        -176
+      ],
+      "id": "fa6f4736-af2b-4f68-ad5a-15381ee8dfac",
+      "name": "Response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4f360190-a717-4a93-8336-d03ea65975d5",
+              "name": "response",
+              "value": "An error occurred. Please try again.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        16
+      ],
+      "id": "5c256946-9548-4588-93fd-78ed2569643d",
+      "name": "Try Again"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1264,
+        -112
+      ],
+      "id": "221832d3-1f29-4aae-876c-c772f19521b5",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "6881182990",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1072,
+        160
+      ],
+      "id": "38e93553-479d-4ec9-9fcb-f10707556e5d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this to update contact info.\nYou must provide a Contact ID!\nTo obtain it, you can search for it first.\nUpdate what you need. I you are requested tu update everything, return the current Information to the unwanted fields. If the field is supposed to be blank, just return \"\"",
+        "operation": "update",
+        "contactId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Contact_ID', ``, 'string') }}",
+        "fields": [
+          "*"
+        ],
+        "updateFields": {
+          "etag": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Etag', ``, 'string') }}",
+          "familyName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Family_Name', ``, 'string') }}",
+          "givenName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Given_Name', ``, 'string') }}",
+          "birthday": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Birthday', ``, 'string') }}",
+          "emailsUi": {
+            "emailsValues": [
+              {
+                "type": "home",
+                "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('emailsValues0_Value', ``, 'string') }}"
+              }
+            ]
+          },
+          "middleName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Middle_Name', ``, 'string') }}",
+          "biographies": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}",
+          "phoneUi": {
+            "phoneValues": [
+              {
+                "type": "mobile",
+                "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('phoneValues0_Value', ``, 'string') }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleContactsTool",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        256
+      ],
+      "id": "9295b724-55a5-4d95-a616-e125f2ef8970",
+      "name": "Update a contact in Google Contacts",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "QQHjy7zg9LRBAWOg",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this to retrieve all phone numbers or use a query to search for a specific number.",
+        "operation": "getAll",
+        "returnAll": true,
+        "fields": [
+          "*"
+        ],
+        "useQuery": true,
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.googleContactsTool",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        240
+      ],
+      "id": "90eb1250-cecc-48d7-a142-62274d65072b",
+      "name": "Get Contacts with Query",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "QQHjy7zg9LRBAWOg",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this to create a phone number.",
+        "familyName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Family_Name', ``, 'string') }}",
+        "givenName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Given_Name', ``, 'string') }}",
+        "additionalFields": {
+          "birthday": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Birthday', ``, 'string') }}",
+          "biographies": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}",
+          "phoneUi": {
+            "phoneValues": [
+              {
+                "type": "mobile",
+                "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('phoneValues0_Value', ``, 'string') }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleContactsTool",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        272
+      ],
+      "id": "b2f502d2-37ad-4117-ab60-1bf6613ac97e",
+      "name": "Create Contact",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "QQHjy7zg9LRBAWOg",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this to delete a phone number.\nYou must provide a Contact ID!\nTo obtain it, you can search for it first.",
+        "operation": "delete",
+        "contactId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Contact_ID', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.googleContactsTool",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        256
+      ],
+      "id": "96dbbeab-02b1-43aa-bd7c-8cf0be66acb3",
+      "name": "Delete Contact",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "QQHjy7zg9LRBAWOg",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "fields": [
+          "*"
+        ],
+        "useQuery": true,
+        "query": "test"
+      },
+      "type": "n8n-nodes-base.googleContacts",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        432
+      ],
+      "id": "3ba9619c-0234-4198-b699-9beb5200f199",
+      "name": "Get many contacts",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "QQHjy7zg9LRBAWOg",
+          "name": "Google Contacts account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Contact Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Agent": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Try Again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Contact Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Contact Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a contact in Google Contacts": {
+      "ai_tool": [
+        [
+          {
+            "node": "Contact Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contacts with Query": {
+      "ai_tool": [
+        [
+          {
+            "node": "Contact Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact": {
+      "ai_tool": [
+        [
+          {
+            "node": "Contact Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Contact": {
+      "ai_tool": [
+        [
+          {
+            "node": "Contact Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d5a42f1d-f2a9-4826-8185-4b9b3778b046",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "207796555c538008e612d32a818bf5cfe856872d10b75a11dc15781656a3929c"
+  },
+  "id": "rDAh6tir0D0DWR9L",
+  "tags": [
+    {
+      "createdAt": "2025-10-07T18:48:37.058Z",
+      "updatedAt": "2025-10-07T18:48:37.058Z",
+      "id": "AJkMvsLrqBrypL0S",
+      "name": "Agent"
+    },
+    {
+      "createdAt": "2025-10-07T20:52:15.541Z",
+      "updatedAt": "2025-10-07T20:52:15.541Z",
+      "id": "BKuq9KxnXEbK7hzb",
+      "name": "Tested - Working"
+    },
+    {
+      "createdAt": "2025-10-07T18:30:54.933Z",
+      "updatedAt": "2025-10-07T18:30:54.933Z",
+      "id": "C8qcujxxgQ2vmWXv",
+      "name": "TaritiGPT"
+    },
+    {
+      "createdAt": "2025-10-07T20:52:36.983Z",
+      "updatedAt": "2025-10-07T20:52:36.983Z",
+      "id": "riVDoKpJDdownhSU",
+      "name": "Incomplete"
+    }
+  ]
+}

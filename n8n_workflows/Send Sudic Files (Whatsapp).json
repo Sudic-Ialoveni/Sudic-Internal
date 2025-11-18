@@ -1,0 +1,695 @@
+{
+  "name": "Send Sudic Files (Whatsapp)",
+  "nodes": [
+    {
+      "parameters": {
+        "fileSelector": "/files/Sudic-Ialoveni/Sudic1/test1.png",
+        "options": {
+          "fileExtension": "png",
+          "dataPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -224
+      ],
+      "id": "ddb0802b-f233-401e-be07-83af67a999cd",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/files/Sudic-Ialoveni/Sudic1/test2.png",
+        "options": {
+          "fileExtension": "png",
+          "dataPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -32
+      ],
+      "id": "7119be06-e49e-4d54-8a76-9901260f8599",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/files/Sudic-Ialoveni/Sudic1/test3.png",
+        "options": {
+          "fileExtension": "png",
+          "dataPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        160
+      ],
+      "id": "240c7ec2-8ff8-404b-a7e6-860beddcdf09",
+      "name": "Read/Write Files from Disk2"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/files/Sudic-Ialoveni/Sudic2/test1.png",
+        "options": {
+          "fileExtension": "png",
+          "dataPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        544
+      ],
+      "id": "0c088ab3-9cb3-4874-8846-e38c5049d469",
+      "name": "Read/Write Files from Disk3"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/files/Sudic-Ialoveni/Sudic2/test2.png",
+        "options": {
+          "fileExtension": "png",
+          "dataPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        736
+      ],
+      "id": "c867f2d5-0ad3-491f-9568-e0ce194e1cd6",
+      "name": "Read/Write Files from Disk4"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/files/Sudic-Ialoveni/Sudic2/test3.png",
+        "options": {
+          "fileExtension": "png",
+          "dataPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        928
+      ],
+      "id": "52e7e56a-3ba8-47f7-9b16-3eba72bdfef2",
+      "name": "Read/Write Files from Disk5"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Number",
+              "type": "number"
+            },
+            {
+              "name": "Complex",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1088,
+        448
+      ],
+      "id": "a55e7faa-2e09-48d8-9cad-73dd541c2148",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Complex }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "bac8802f-93c6-4b3c-8602-375d9182ae11"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f382241-964d-458d-a385-51cc13092153",
+                    "leftValue": "={{ $json.Complex }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -640,
+        448
+      ],
+      "id": "12703318-a717-48b5-ae93-0e63c59065b1",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0f151ff4-10d5-4ba5-aeb3-14e641807bef",
+              "name": "Number",
+              "value": "={{ $('Edit Fields').item.json.Number }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        64
+      ],
+      "id": "9d6ab93d-3391-473d-b3bb-025ff673dce7",
+      "name": "Set Chat ID",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "282565d8-bbd2-4920-a015-7de8302ae336",
+              "name": "Number",
+              "value": "={{ $json.Number }}",
+              "type": "string"
+            },
+            {
+              "id": "9909bc7b-f8a7-45ee-a262-096197595788",
+              "name": "Complex",
+              "value": "={{ $json.Complex }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -864,
+        448
+      ],
+      "id": "0d745052-4d01-4def-9894-b024ce645826",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0f151ff4-10d5-4ba5-aeb3-14e641807bef",
+              "name": "Number",
+              "value": "={{ $('Edit Fields').item.json.Number }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        832
+      ],
+      "id": "1a5a5353-2580-408d-9186-d50a3d2ebbf8",
+      "name": "Set Chat ID1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1913c79c-d090-48c2-9fcd-e4cf2250bd9c",
+              "name": "=Telegram_ChatID",
+              "value": "={{ $node[\"Set Chat ID1\"].json[\"Telegram_ChatID\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        1120
+      ],
+      "id": "801d7409-18bc-4818-8934-66d5563c8bcb",
+      "name": "Edit Fields9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1913c79c-d090-48c2-9fcd-e4cf2250bd9c",
+              "name": "=Telegram_ChatID",
+              "value": "={{ $node[\"Set Chat ID\"].json[\"Telegram_ChatID\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "1a5c977c-c0f8-4bc5-a4ce-c8b263fd339f",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        352
+      ],
+      "id": "4dececa1-40e7-4087-9c10-f7863726369b",
+      "name": "Edit Fields10"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/files/Sudic-Ialoveni/Sudic2/test3.png",
+        "options": {
+          "fileExtension": "png",
+          "dataPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        1344
+      ],
+      "id": "8700fdb4-3362-4471-abb0-81f329eb1a25",
+      "name": "Read/Write Files from Disk6"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "865505613308608",
+        "recipientPhoneNumber": "={{ $('Set Chat ID').item.json.Number }}",
+        "messageType": "image",
+        "mediaPath": "useMedian8n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        -224
+      ],
+      "id": "75993412-d2a9-4ec9-9779-c84f60b63086",
+      "name": "Send message",
+      "webhookId": "3914af2e-1fbb-41fe-a42a-4c09df51fe75",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "TdYs5SGj9gwx8Njt",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "865505613308608",
+        "recipientPhoneNumber": "={{ $('Set Chat ID').item.json.Number }}",
+        "messageType": "image",
+        "mediaPath": "useMedian8n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        -32
+      ],
+      "id": "974253c3-af69-46eb-ad72-77d2a8ee7b83",
+      "name": "Send message1",
+      "webhookId": "3914af2e-1fbb-41fe-a42a-4c09df51fe75",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "TdYs5SGj9gwx8Njt",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "865505613308608",
+        "recipientPhoneNumber": "={{ $('Set Chat ID').item.json.Number }}",
+        "messageType": "image",
+        "mediaPath": "useMedian8n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        160
+      ],
+      "id": "fbf35cd9-fcdb-45e5-b8e8-9db17bdeb3d5",
+      "name": "Send message2",
+      "webhookId": "3914af2e-1fbb-41fe-a42a-4c09df51fe75",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "TdYs5SGj9gwx8Njt",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "865505613308608",
+        "recipientPhoneNumber": "={{ $('Set Chat ID1').item.json.Number }}",
+        "messageType": "image",
+        "mediaPath": "useMedian8n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        544
+      ],
+      "id": "5447187b-616c-45fc-920c-1cb565bd21f3",
+      "name": "Send message3",
+      "webhookId": "3914af2e-1fbb-41fe-a42a-4c09df51fe75",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "TdYs5SGj9gwx8Njt",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "865505613308608",
+        "recipientPhoneNumber": "={{ $('Set Chat ID1').item.json.Number }}",
+        "messageType": "image",
+        "mediaPath": "useMedian8n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        736
+      ],
+      "id": "e47d0a16-01e7-4f4c-a8f7-5e02a942e908",
+      "name": "Send message4",
+      "webhookId": "3914af2e-1fbb-41fe-a42a-4c09df51fe75",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "TdYs5SGj9gwx8Njt",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "865505613308608",
+        "recipientPhoneNumber": "={{ $('Set Chat ID1').item.json.Number }}",
+        "messageType": "image",
+        "mediaPath": "useMedian8n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        928
+      ],
+      "id": "61036ef7-9155-4fbd-93f0-64e690723f64",
+      "name": "Send message5",
+      "webhookId": "3914af2e-1fbb-41fe-a42a-4c09df51fe75",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "TdYs5SGj9gwx8Njt",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk2": {
+      "main": [
+        [
+          {
+            "node": "Send message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk3": {
+      "main": [
+        [
+          {
+            "node": "Send message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk4": {
+      "main": [
+        [
+          {
+            "node": "Send message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk5": {
+      "main": [
+        [
+          {
+            "node": "Send message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Set Chat ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Chat ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Chat ID": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read/Write Files from Disk2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Chat ID1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read/Write Files from Disk5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read/Write Files from Disk3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields9": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields10": {
+      "main": [
+        []
+      ]
+    },
+    "Read/Write Files from Disk6": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "baa2309a-059b-4e65-9c9c-68943418c88d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "207796555c538008e612d32a818bf5cfe856872d10b75a11dc15781656a3929c"
+  },
+  "id": "4kIBonQo3XheYD8B",
+  "tags": [
+    {
+      "createdAt": "2025-10-07T20:52:15.541Z",
+      "updatedAt": "2025-10-07T20:52:15.541Z",
+      "id": "BKuq9KxnXEbK7hzb",
+      "name": "Tested - Working"
+    },
+    {
+      "createdAt": "2025-11-02T11:44:01.975Z",
+      "updatedAt": "2025-11-02T11:44:01.975Z",
+      "id": "CFIRsCZ4wcdRFXva",
+      "name": "Sudic"
+    },
+    {
+      "createdAt": "2025-10-07T21:56:14.583Z",
+      "updatedAt": "2025-10-07T21:56:14.583Z",
+      "id": "wIhePW2VeZs9gdVU",
+      "name": "IN PROD"
+    }
+  ]
+}

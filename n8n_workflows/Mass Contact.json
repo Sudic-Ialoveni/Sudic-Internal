@@ -1,0 +1,503 @@
+{
+  "name": "Mass Contact",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Input: CSV converted to JSON (from previous ExtractFromFile node)\nconst items = $input.all();\n\nconst emailsSet = new Set();\nconst phonesSet = new Set();\n\n// Robust email regex\nconst emailRegex = /[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}/g;\n\n// Moldovan phone numbers: +373xxxxxxxx, 373xxxxxxxx, 0xxxxxxxx\nconst phoneRegex = /(?:\\+?373|0)[\\d\\s().-]{7,12}/g;\n\nfor (const item of items) {\n    const data = item.json;\n\n    for (const key in data) {\n        if (!data.hasOwnProperty(key)) continue;\n        const value = String(data[key] || '');\n\n        // Emails\n        const foundEmails = value.match(emailRegex);\n        if (foundEmails) foundEmails.forEach(e => emailsSet.add(e.trim().toLowerCase()));\n\n        // Phones\n        const foundPhones = value.match(phoneRegex);\n        if (foundPhones) {\n            foundPhones.forEach(p => {\n                const cleaned = p.replace(/[\\s().-]/g, '');\n                phonesSet.add(cleaned);\n            });\n        }\n    }\n}\n\nreturn [{\n    json: {\n        emails: Array.from(emailsSet),\n        phones: Array.from(phonesSet)\n    }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -128
+      ],
+      "id": "3b057c97-6cfc-4e3b-8010-c2e17d9620eb",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1u5DwKqZMcOoAQXV7j6rRPGwth3scd3xH",
+          "mode": "list",
+          "cachedResultName": "Contacte_Clienti_Sudic.csv",
+          "cachedResultUrl": "https://drive.google.com/file/d/1u5DwKqZMcOoAQXV7j6rRPGwth3scd3xH/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -352,
+        -128
+      ],
+      "id": "0b75cfbb-6611-4bac-bd9b-52b9cdfbd7f6",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "e7tEGaTk04cXmdXB",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -128
+      ],
+      "id": "81a07bfb-3d12-41ee-bdcb-34915d604673",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.emails.map(email => {\n  return {\n    json: {\n      email: email\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        -208
+      ],
+      "id": "84d3d614-669a-47fb-8ba5-86e2d0b5a393",
+      "name": "Split to Email"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.phones.map(phone => {\n  return {\n    json: {\n      phone: phone\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        -16
+      ],
+      "id": "3f1aace0-71ea-4cf6-b7b8-fea39c8d3aef",
+      "name": "Split to Number"
+    },
+    {
+      "parameters": {
+        "from": "+1 5642144290",
+        "to": "+37369151012",
+        "message": "HELLO WORLD))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        944,
+        32
+      ],
+      "id": "e57e001d-7390-4440-8ee3-048f0d6b3ac9",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "2pOJL4iMrbYf9Sge",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Noutăți privind evoluția proiectului Sudic Ialoveni",
+        "message": "=<!DOCTYPE html>\n<html lang=\"ro\" style=\"margin:0; padding:0;\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\" />\n    <title>SUDIC – Informare</title>\n  </head>\n\n  <body style=\"margin:0; padding:0; background-color:#f5f5f5; font-family:Arial, sans-serif;\">\n\n    <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color:#f5f5f5; padding:40px 0;\">\n      <tr>\n        <td align=\"center\">\n\n          <table width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.1);\">\n\n            <!-- HEADER -->\n            <tr>\n              <td align=\"center\" style=\"background:#ffffff; padding:30px 20px;\">\n                <img src=\"https://i.ibb.co/Y4pDmrTc/icon.png\" alt=\"Sudic Logo\" width=\"80\" style=\"display:block; margin-bottom:10px;\" />\n              </td>\n            </tr>\n\n            <!-- BODY -->\n            <tr>\n              <td style=\"padding:30px 40px; color:#333333; font-size:16px; line-height:1.6;\">\n\n                <p style=\"margin:0 0 20px;\">Stimați prieteni și cumpărători,</p>\n\n                <p style=\"margin:0 0 20px;\">\n                  Vă informăm că termenul de dare în exploatare a Complexului Sudic Ialoveni, \n                  a fost ajustat pentru <strong>30 iunie 2026</strong>, din cauza complexității tehnice și logistice a proiectului, \n                  care implică multiple etape de lucrări de infrastructură și de finisaje.\n                </p>\n\n                <p style=\"margin:0 0 20px;\">\n                  Dorim să vă asigurăm că această ajustare are drept scop menținerea standardelor de calitate asumate și livrarea unui produs final \n                  care să ofere confort și valoare durabilă tuturor proprietarilor.\n                </p>\n\n                <p style=\"margin:0 0 20px;\">\n                  Totodată, conform prevederilor contractuale și legislației Republicii Moldova, dezvoltatorul are dreptul de a prelungi termenul \n                  de execuție a lucrărilor cu până la 6 luni; această situație este reglementată de punctul <strong>9.6</strong> din contract \n                  și nu se consideră o încălcare contractuală.\n                </p>\n\n                <p style=\"margin:0 0 20px;\">\n                  Vă garantăm că echipa noastră depune toate eforturile pentru a finaliza proiectul în cele mai bune condiții și în cel mai scurt timp posibil.\n                </p>\n\n                <p style=\"margin:0 0 20px;\">\n                  Mai multe informații despre evoluția lucrărilor le puteți vedea pe:<br />\n                  <a href=\"https://www.facebook.com/sudic.md\" style=\"color:#0056b3; text-decoration:none;\">Facebook</a><br />\n                  <a href=\"https://www.youtube.com/@SudicComplex\" style=\"color:#0056b3; text-decoration:none;\">YouTube</a>\n                </p>\n\n                <p style=\"margin:30px 0 0;\">Cu stimă,<br />Echipa SUDIC</p>\n\n              </td>\n            </tr>\n\n            <!-- FOOTER -->\n            <tr>\n              <td align=\"center\" style=\"background:#fafafa; padding:20px; font-size:12px; color:#999999;\">\n                © SUDIC. Toate drepturile rezervate.\n              </td>\n            </tr>\n\n          </table>\n\n        </td>\n      </tr>\n    </table>\n\n  </body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        928,
+        -240
+      ],
+      "id": "9b3562ef-afb5-43fa-ac2e-bf490d961f1e",
+      "name": "Send a message",
+      "webhookId": "2de0a107-f9ea-464a-b93a-0bec35a0ea50",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rfCSn2m9zOJph9So",
+          "name": "sudic.md@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        608,
+        -256
+      ],
+      "id": "7980848f-1bbe-4589-ad5e-a287d5018df2",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        624,
+        32
+      ],
+      "id": "fec3e0f0-34d1-4e94-8438-9d0a7aaabb2c",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        -112
+      ],
+      "id": "85289279-1265-461d-8667-b0e039f8217f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "6881182990",
+        "message": "Are you sure you want to send this message to over 100 contacts?",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -848,
+        -112
+      ],
+      "id": "0c873d6e-0c52-4159-816c-3cea2b48e7af",
+      "name": "Send a text message",
+      "webhookId": "e9ac5413-d3ff-45fb-80a0-b237c3d301b1",
+      "credentials": {
+        "telegramApi": {
+          "id": "cvc2WkMgs4GmwPKB",
+          "name": "TaritiGPT_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.approved.toString() }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3a8cc3af-86af-4d2d-9285-c58860a87ae1"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6b4b96cd-5700-4065-9a31-e8175ca41fba",
+                    "leftValue": "={{ $json.data.approved.toString() }}",
+                    "rightValue": "false",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -640,
+        -112
+      ],
+      "id": "b25e131e-e1bf-43c3-b9db-06b9acc93ebb",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "6881182990",
+        "text": "Aborted Send.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -352,
+        64
+      ],
+      "id": "768df439-339f-48c3-80ce-d4d54dcfdb3b",
+      "name": "Send a text message1",
+      "webhookId": "e9ac5413-d3ff-45fb-80a0-b237c3d301b1",
+      "credentials": {
+        "telegramApi": {
+          "id": "cvc2WkMgs4GmwPKB",
+          "name": "TaritiGPT_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6881182990",
+        "text": "Entering The loop to send Emails.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        -384
+      ],
+      "id": "329a1079-6338-4f15-8542-d60b21fe7f8b",
+      "name": "Send a text message2",
+      "webhookId": "e9ac5413-d3ff-45fb-80a0-b237c3d301b1",
+      "credentials": {
+        "telegramApi": {
+          "id": "cvc2WkMgs4GmwPKB",
+          "name": "TaritiGPT_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6881182990",
+        "text": "Entering The loop to send SMS Messages.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        160
+      ],
+      "id": "28ea1985-c98b-4ff9-b2cc-04e4bdee557c",
+      "name": "Send a text message3",
+      "webhookId": "e9ac5413-d3ff-45fb-80a0-b237c3d301b1",
+      "credentials": {
+        "telegramApi": {
+          "id": "cvc2WkMgs4GmwPKB",
+          "name": "TaritiGPT_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": " /api/v1/gateway/devices/:id/send-sms",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1232,
+        -208
+      ],
+      "id": "edf9a272-c396-4663-af76-684a7b2b0b19",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jJgf8E7mYGox1JE4",
+          "name": "Alteg.io API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split to Number",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split to Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split to Number": {
+      "main": [
+        []
+      ]
+    },
+    "Split to Email": {
+      "main": [
+        []
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fc9bae4f-2dac-47bb-9877-dc8fa91e5206",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "207796555c538008e612d32a818bf5cfe856872d10b75a11dc15781656a3929c"
+  },
+  "id": "1Co624mr6faaj5tc",
+  "tags": []
+}

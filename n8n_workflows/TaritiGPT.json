@@ -1,0 +1,756 @@
+{
+  "name": "TaritiGPT",
+  "nodes": [
+    {
+      "parameters": {
+        "name": "emailAgent",
+        "description": "Call this tool for any email actions.",
+        "workflowId": {
+          "__rl": true,
+          "value": "TnPcPGh2UqqMMlls",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/TnPcPGh2UqqMMlls",
+          "cachedResultName": "Email Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        752
+      ],
+      "id": "8ade4dd5-88e7-449d-9c74-73101bdec96d",
+      "name": "Email Agent"
+    },
+    {
+      "parameters": {
+        "name": "contactAgent",
+        "description": "Call this tool for any contact related actions.",
+        "workflowId": {
+          "__rl": true,
+          "value": "rDAh6tir0D0DWR9L",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/rDAh6tir0D0DWR9L",
+          "cachedResultName": "Contact Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        752
+      ],
+      "id": "0ae6ffb7-dc04-4f8d-ad69-4aa00c9018a6",
+      "name": "Contact Agent"
+    },
+    {
+      "parameters": {
+        "name": "contentCreator",
+        "description": "Call this tool to create blog posts.",
+        "workflowId": {
+          "__rl": true,
+          "value": "SYMaGWeQlGDvLpLw",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/SYMaGWeQlGDvLpLw",
+          "cachedResultName": "Content Creator Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1776,
+        752
+      ],
+      "id": "45d2a63a-5490-43f9-868c-4089699a8983",
+      "name": "Content Creator Agent"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to search the internet",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"api_key\": \"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\",\n    \"query\": \"{searchTerm}\",\n    \"search_depth\": \"basic\",\n    \"include_answer\": true,\n    \"topic\": \"news\",\n    \"include_raw_content\": true,\n    \"max_results\": 3\n} ",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "searchTerm",
+              "description": "What the user has requested to search the internet for",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        2288,
+        768
+      ],
+      "id": "fdf60337-c381-4d36-a193-53cf57383166",
+      "name": "Tavily"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        2448,
+        768
+      ],
+      "id": "6d726fbf-83dd-4715-af02-0e216ce397b7",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "name": "calendarAgent",
+        "description": "Call this tool for any calendar action.",
+        "workflowId": {
+          "__rl": true,
+          "value": "cWIi64NPqVF3TC06",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/cWIi64NPqVF3TC06",
+          "cachedResultName": "Calendar Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        752
+      ],
+      "id": "4281bf9b-7e23-4592-81ea-709fab5254c3",
+      "name": "Calendar Agent"
+    },
+    {
+      "parameters": {
+        "content": "# Parent Agent\n\n",
+        "height": 260,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1552,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "cd953435-3396-433c-9b39-b5ddbc934903",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Children\n## Sub-Workflows\n",
+        "height": 200,
+        "width": 944,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1120,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "3898a956-444d-43ed-ba21-bc6768585d06",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        2736,
+        784
+      ],
+      "id": "4fe44b0a-422e-48fe-afc7-5429c212d865",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "content": "# Think\n",
+        "height": 200,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        704
+      ],
+      "id": "e288c951-283e-4ef8-a76a-91148ecb1f84",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "ec383367-151d-4310-9189-5f0db5167431",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        704,
+        208
+      ],
+      "webhookId": "99eab1a0-569d-4f0f-a49e-578a02abfe63",
+      "credentials": {
+        "telegramApi": {
+          "id": "cvc2WkMgs4GmwPKB",
+          "name": "TaritiGPT_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe7ecc99-e1e8-4a5e-bdd6-6fce9757b234",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "191f9159-a8b5-4a9e-bdf9-37df93f50a29",
+      "name": "Set 'Text'",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1216,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "f78f2b60-3ced-4c9d-bc50-53965276c04c",
+      "name": "Download Voice File",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1152,
+        64
+      ],
+      "webhookId": "c0b376b1-7b63-41b6-8063-0b3096b8333d",
+      "credentials": {
+        "telegramApi": {
+          "id": "cvc2WkMgs4GmwPKB",
+          "name": "TaritiGPT_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "id": "995495bf-0c8b-4a20-b9b5-c7117666258f",
+      "name": "Transcribe Audio",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1312,
+        64
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "wQkGdx4XmPN63V1S",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8c844924-b2ed-48b0-935c-c66a8fd0c778",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ba1f0838-a725-43bd-a0cf-24ae62543f3e",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        976,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "fa3fe9fd-02f1-4c17-9172-bd14e732c0c8",
+      "name": "Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2208,
+        256
+      ],
+      "webhookId": "682ca5ab-d30c-4ea5-bb25-c2f26206e761",
+      "credentials": {
+        "telegramApi": {
+          "id": "cvc2WkMgs4GmwPKB",
+          "name": "TaritiGPT_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 5000
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        752
+      ],
+      "id": "9470f1e6-a0cb-4ba9-89bd-719ce852f0f8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        752
+      ],
+      "id": "46ea9140-d8b3-43d2-9b48-caf4a761d8e8",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wQkGdx4XmPN63V1S",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendDocument",
+        "chatId": "6881182990",
+        "binaryData": true,
+        "binaryPropertyName": "=data",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2352,
+        48
+      ],
+      "id": "4d6b87ce-b3ec-43b6-a93d-12ddd2eb26ba",
+      "name": "Send a document",
+      "webhookId": "11b41aa8-fd35-48d0-a85d-46ef3a2f0867",
+      "credentials": {
+        "telegramApi": {
+          "id": "cvc2WkMgs4GmwPKB",
+          "name": "TaritiGPT_bot"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "# Tools\n",
+        "height": 200,
+        "width": 432,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2144,
+        704
+      ],
+      "id": "6245587e-953d-42a4-a4e8-3be914fb8050",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# AI Basics\n",
+        "height": 200,
+        "width": 464,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        576,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "41d88511-9e2b-49eb-8614-d5a40cc274c8",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "KWSRrfafH7SS9zjA",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/KWSRrfafH7SS9zjA",
+          "cachedResultName": "Drive Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1920,
+        752
+      ],
+      "id": "a10b1437-cb0b-412d-9fc2-04d21e9abb7c",
+      "name": "Drive Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "={{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=What is TaritiGPT?\n\nTaritiGPT is the next-generation personal AI assistant designed exclusively for employees of Tariti Media Agency.\nIts mission is to become each employee’s right hand, handling day-to-day digital operations, automating routine tasks, and optimizing internal workflow across all departments — from marketing and design to management and client relations.\n\nEach Tariti employee will have their own individual instance of TaritiGPT, fully integrated with their Tariti work account, including personal email, calendar, contacts, drive files, and creative tools.\n\nTaritiGPT’s main function is not to perform tasks itself, but to delegate them intelligently to the correct specialized tool or agent. It acts as a dispatcher — interpreting employee requests and routing them to the appropriate automation module or workspace integration.\n\nAbout Tariti\n\nTariti is a media agency based in Chișinău, Moldova, known for its creative and performance-oriented approach to marketing, sales, branding, and social media.\n\nFounded with the mission of helping clients achieve measurable goals through creativity and strategy, Tariti has built a strong portfolio across diverse industries. With more than 8 years of experience and over 20 successfully executed projects, Tariti delivers integrated solutions in design, promotion, video, and automation.\n\nKey Services:\n\nCreative Concept & Design\n\nAdvertising Material Development\n\nVideo Production\n\nDigital Promotion & Social Media\n\nSales Automation & Marketing Strategy\n\nContact Information:\n\nWebsite: tariti.com\n\nEmail: info@tariti.com\n\nPhone: +373 78 44 88 88\n\nAddress: Or. Chișinău, str. Vasile Alecsandri 100/1\n\nDeveloper & Testing Notice\n\nThis instance of TaritiGPT is currently in active testing and configuration.\nAll chats during this stage are initiated, monitored, and reviewed by the developer, Gligor Teodor (teodor.gligor2011@gmail.com).\n\nTeodor is building and refining TaritiGPT for full internal deployment across Tariti’s departments.\nTesting goals include:\n\nValidating integration between all TaritiGPT tools (Email, Drive, Calendar, Contacts, etc.)\n\nEvaluating agent communication efficiency\n\nTesting the reasoning system (Think tool)\n\nEnsuring correct task routing and context awareness\n\nThis is not a public release. All responses and data handled in this environment are part of internal testing.\n\nTaritiGPT’s Purpose\n\nTaritiGPT’s purpose is to:\n\nAssist employees in their daily work, functioning as their personal AI assistant.\n\nAutomate repetitive or time-consuming actions by connecting to Tariti’s tool ecosystem.\n\nImprove workflow efficiency across all teams at Tariti.\n\nMaintain security and privacy by keeping all data within Tariti’s internal systems.\n\nIt should never act as a general chatbot or creative writer. Its role is entirely operational, not conversational.\n\nTools\n\nTaritiGPT has access to several specialized agents and utility tools. Each one serves a specific purpose. TaritiGPT’s responsibility is to identify which tool is appropriate for a given user request.\n\nTool\tPurpose\nThink\tUsed for deep reasoning, planning, or verifying that the right steps and tools were chosen. Always called before final action.\nTavily\tWeb search tool for gathering live information, current events, or verifying external data.\nCalculator\tHandles any form of arithmetic, logical, or numerical computation.\nEmail Agent\tManages all email actions — sending, drafting, forwarding, replying, etc.\nDrive Agent\tHandles file and folder management within the Tariti Google Drive or internal storage.\nCalendar Agent\tSchedules, updates, or deletes meetings and reminders.\nContact Agent\tRetrieves, updates, or creates new contact entries from the user’s Tariti workspace.\nContent Creator Agent\tCreates professional written content such as blog posts, campaign text, promotional descriptions, or structured documents.\nRules\n\nPrimary Function: TaritiGPT’s only job is to correctly identify and call the appropriate tool or agent. It should not manually compose emails, write summaries, or directly execute human-like actions.\n\nUse the Think Tool: Always use the Think tool to reason or verify before performing an action. It ensures accuracy and compliance.\n\nContact First: For sending or drafting emails and scheduling calendar events with attendees, always use the Contact Agent first to fetch contact details.\n\nSequential Logic: Tools must be called in logical order — for example, retrieving a contact before emailing them.\n\nNo Direct Writing: All text-based content must be produced by the Content Creator Agent, never written directly by TaritiGPT.\n\nAgent Delegation: Each agent handles its own scope. TaritiGPT only delegates; it never substitutes the agent’s logic.\n\nVerification Step: After tool use, always call the Think tool to confirm that the workflow followed correct logic.\n\nContext Awareness: Use stored or live data only when relevant to the reasoning or necessary for a clear, contextual response.\n\nProfessional Tone: Maintain a consistent, internal-use, professional tone across all responses.\n\nLive Data\n\nTaritiGPT can access the following dynamic context variables.\nThese should be used only when needed for reasoning or to enhance chat clarity — not displayed unnecessarily.\n\nCurrent Date/Time: {{ $now }}\n\nTelegram Conversation ID: {{ $('Telegram Trigger').item.json.message.chat.id }}\n\nThese variables are automatically replaced by n8n during runtime.\n\nInstructions\n\nWhen a user sends a message:\n\nInterpret the request carefully and determine which tools are required.\n\nUse the Think tool to confirm the logic flow.\n\nExecute the necessary agent actions, following the rules of contact lookup and task delegation.\n\nUse the Think tool again to verify the correctness of your actions.\n\nRespond concisely and professionally, confirming the result of the tool call (not performing the action yourself).\n\nExample Workflows\nExample 1 — Sending an Email\n\nInput: “Send an email to Nate Herkelman asking him what time he wants to leave.”\nProcess:\n\nUse Contact Agent to find Nate Herkelman’s email address.\n\nUse Email Agent to send the message.\n\nUse Think to verify the correct workflow.\nOutput: “The email has been sent to Nate Herkelman. Anything else I can help you with?”\n\nExample 2 — Scheduling a Meeting\n\nInput: “Schedule a meeting with Ana Popescu for Friday at 2 PM.”\nProcess:\n\nUse Contact Agent to retrieve Ana’s contact or calendar info.\n\nUse Calendar Agent to create the event and invite Ana.\n\nUse Think to verify success.\nOutput: “The meeting with Ana Popescu has been scheduled for Friday at 2 PM.”\n\nExample 3 — Creating Content\n\nInput: “Create a short promotional description for the new Tariti branding campaign.”\nProcess:\n\nUse Content Creator Agent to generate the promotional text.\n\nUse Think to confirm correctness and alignment with task intent.\nOutput: “The campaign description has been created. Would you like me to save it to Drive?”\n\nExample 4 — Web Search\n\nInput: “Find the latest marketing trends in Moldova for 2025.”\nProcess:\n\nUse Tavily to search the web for updated marketing trend reports.\n\nUse Think to summarize and confirm relevance.\nOutput: “Here are the latest 2025 marketing trends in Moldova from verified sources.”\n\nExample 5 — Calculation or Data Logic\n\nInput: “If our sales grew by 15% in Q1 and 10% in Q2, what’s the total increase?”\nProcess:\n\nUse Calculator to compute combined growth.\n\nUse Think to verify the mathematical accuracy.\nOutput: “The total cumulative increase is approximately 26.5%.”\n\nFinal Reminders\n\nTaritiGPT operates strictly within Tariti’s internal ecosystem.\n\nIt is currently under testing and refinement.\n\nLive data values ({{ $now }} and {{ $('Telegram Trigger').item.json.message.chat.id }}) are replaced dynamically by n8n.\n\nThis environment is for internal testing only, not for production deployment."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1632,
+        208
+      ],
+      "id": "7d7657df-c415-41d9-bf7c-fecd7446bef5",
+      "name": "TaritiGPT",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Email Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Creator Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Voice File": {
+      "main": [
+        [
+          {
+            "node": "Transcribe Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Download Voice File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set 'Text'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set 'Text'": {
+      "main": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe Audio": {
+      "main": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Drive Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "TaritiGPT",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TaritiGPT": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8b74bb4f-2d50-4580-b66f-a1a305dc835b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "207796555c538008e612d32a818bf5cfe856872d10b75a11dc15781656a3929c"
+  },
+  "id": "ssIHKdRv6GjjKy9A",
+  "tags": [
+    {
+      "createdAt": "2025-10-07T18:48:37.058Z",
+      "updatedAt": "2025-10-07T18:48:37.058Z",
+      "id": "AJkMvsLrqBrypL0S",
+      "name": "Agent"
+    },
+    {
+      "createdAt": "2025-10-07T18:30:54.933Z",
+      "updatedAt": "2025-10-07T18:30:54.933Z",
+      "id": "C8qcujxxgQ2vmWXv",
+      "name": "TaritiGPT"
+    },
+    {
+      "createdAt": "2025-10-07T21:56:14.583Z",
+      "updatedAt": "2025-10-07T21:56:14.583Z",
+      "id": "wIhePW2VeZs9gdVU",
+      "name": "IN PROD"
+    }
+  ]
+}

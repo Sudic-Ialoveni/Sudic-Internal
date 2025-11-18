@@ -1,0 +1,795 @@
+{
+  "name": "amocrm",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -2208,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken"
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -1648,
+        208
+      ],
+      "id": "cf4f00b7-01f8-426b-8d34-492ccb51703b",
+      "name": "Get account info",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "catalogs",
+        "operation": "addCatalogElements"
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        432
+      ],
+      "id": "5d7d8525-f32c-4a7f-a949-21dab512ee33",
+      "name": "Add multiple catalog elements into the account",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "catalogs",
+        "operation": "addCatalogs",
+        "collection": {
+          "catalog": [
+            {
+              "name": "Test Catalog",
+              "can_add_elements": true,
+              "can_link_multiple": true,
+              "request_id": "123"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        880
+      ],
+      "id": "cfbee919-6cfa-4780-b773-7dbb7a4b0011",
+      "name": "Add multiple catalogs",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "catalogs",
+        "operation": "updateCatalogElements",
+        "catalog_id": 12787,
+        "collection": {
+          "element": [
+            {
+              "name": "test",
+              "custom_fields_values": {
+                "custom_field": [
+                  {
+                    "data": "{\"id\":2521829,\"type\":\"price\"}",
+                    "value": "100"
+                  }
+                ]
+              },
+              "request_id": "1234"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        1104
+      ],
+      "id": "0cabdcba-6f81-45d6-9320-a1b37d386708",
+      "name": "Editing multiple catalog elements",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "catalogs",
+        "operation": "updateCatalogs"
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        656
+      ],
+      "id": "cc13dd5d-27e6-474f-8d4a-d571f2000743",
+      "name": "Editing multiple catalogs",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "catalogs",
+        "operation": "getCatalogElements",
+        "returnAll": true,
+        "filter": {},
+        "limit": 500
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        208
+      ],
+      "id": "acf7ac04-1572-4ba9-92aa-bc9fac42b1f1",
+      "name": "Get available catalog elements on the account",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "catalogs",
+        "returnAll": true,
+        "limit": 500
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        1328
+      ],
+      "id": "dc809b93-299c-4c7d-8c87-9620fc9173c3",
+      "name": "Get available catalogs",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "companies",
+        "returnAll": true,
+        "filter": {
+          "query": "test 2"
+        },
+        "options": {},
+        "limit": 500
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        208
+      ],
+      "id": "13d10c79-13a6-4c1f-a18d-ae15a991e8aa",
+      "name": "Get list of companies",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "companies",
+        "operation": "createCompany",
+        "collection": {
+          "company": [
+            {
+              "name": "test 2",
+              "responsible_user_id": 13108862,
+              "created_by": 13108862,
+              "updated_by": 13108862
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        432
+      ],
+      "id": "243b9d63-8cc4-4834-91a0-1d9af5b4e002",
+      "name": "Create new companies",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "companies",
+        "operation": "updateCompany"
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        656
+      ],
+      "id": "5a2cbf3b-664a-404e-a0dc-018249baccb4",
+      "name": "Update companies",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "contacts",
+        "returnAll": true,
+        "filter": {},
+        "options": {},
+        "limit": 500
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        656
+      ],
+      "id": "9017ddc7-2a2b-4102-a190-89a3b25757b6",
+      "name": "Get list of contacts",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "contacts",
+        "operation": "createContacts",
+        "collection": {
+          "contact": [
+            {
+              "name": "Teodor Gligor",
+              "first_name": "Gligor",
+              "last_name": "Teodor",
+              "responsible_user_id": 13108862,
+              "created_by": 13108862,
+              "updated_by": 13108862,
+              "custom_fields_values": {
+                "custom_field": [
+                  {
+                    "data": "{\"id\":2517785,\"type\":\"multitext\"}",
+                    "value": "teodor.gligor2011@gmail.com"
+                  },
+                  {
+                    "data": "{\"id\":2517781,\"type\":\"text\"}",
+                    "value": "+37369151012"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        208
+      ],
+      "id": "0accf423-2469-44d1-bf51-c291e29fefe8",
+      "name": "Create new contacts",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "contacts",
+        "operation": "updateContacts"
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        432
+      ],
+      "id": "eefd5538-02ce-41b7-9427-1e0222a59c3f",
+      "name": "Update contacts",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "leads",
+        "returnAll": true,
+        "filter": {},
+        "options": {},
+        "limit": 500
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        432
+      ],
+      "id": "3d05e086-32d2-4b0c-87c7-5dbcbb5cdd95",
+      "name": "Get list of leads",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "leads",
+        "operation": "createLeads",
+        "collection": {
+          "lead": [
+            {
+              "name": "test lead",
+              "price": 100,
+              "pipeline_id": 10198190,
+              "created_by": 13108862,
+              "updated_by": 13108862,
+              "responsible_user_id": 13108862,
+              "_embedded": {
+                "contacts": [
+                  {
+                    "id": {
+                      "contact": [
+                        {
+                          "id": 73483255
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        656
+      ],
+      "id": "b19db13c-1ef1-4dab-b01d-0c433a656732",
+      "name": "Create new leads",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "leads",
+        "operation": "updateLeads",
+        "collection": {
+          "lead": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        208
+      ],
+      "id": "6d5c9e3b-9abd-4bff-9e2f-87c3bcefa55d",
+      "name": "Update leads",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "notes",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        32,
+        656
+      ],
+      "id": "bbc50744-3f77-4279-ab08-372ca5131b0e",
+      "name": "Get list of notes",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "notes",
+        "operation": "createNotes",
+        "notes": {
+          "common": [
+            {
+              "entity_id": 0,
+              "created_by": 13108862,
+              "text": "test",
+              "request_id": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        32,
+        208
+      ],
+      "id": "204efc81-ea8a-44bf-aaf0-369c93949f09",
+      "name": "Create new notes",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "notes",
+        "operation": "updateNotes"
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        32,
+        432
+      ],
+      "id": "6a0a38ec-4378-409e-86f1-eda5157b6e1d",
+      "name": "Update notes",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "tasks",
+        "returnAll": true,
+        "filter": {},
+        "options": {},
+        "limit": 500
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        368,
+        432
+      ],
+      "id": "b0efabbd-ca44-4eb7-8114-9218f540f360",
+      "name": "Get list of tasks",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "tasks",
+        "operation": "createTasks",
+        "collection": {
+          "task": [
+            {
+              "text": "test",
+              "responsible_user_id": 13108862,
+              "entity_type": "contacts",
+              "entity_id": "73483255",
+              "duration": 62,
+              "resultText": "test",
+              "created_by": 13108862,
+              "updated_by": 13108862
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        368,
+        656
+      ],
+      "id": "51fe56ef-bfff-4ed1-8daf-94b733eb4b36",
+      "name": "Create new tasks",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "tasks",
+        "operation": "updateTasks"
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        368,
+        208
+      ],
+      "id": "28875930-ab66-4050-a5db-43a6eddb5b18",
+      "name": "Update tasks",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "quib1IimFbjwnrEC",
+          "name": "Teodor Test Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Account",
+        "height": 1376,
+        "width": 262,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1696,
+        144
+      ],
+      "id": "9651019f-280a-454e-98b7-685eebdc442e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Catalogs",
+        "height": 1376,
+        "width": 262,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        144
+      ],
+      "id": "bde69b08-e172-47e3-bd4c-d4ef67ba55d1",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Companies",
+        "height": 1376,
+        "width": 262,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        144
+      ],
+      "id": "3d30fc58-c2d7-4fd0-9376-51d55d913d47",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Contacts",
+        "height": 1376,
+        "width": 262,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        144
+      ],
+      "id": "47a2dbb1-7c2f-4282-89cd-ad346e53e3c9",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Leads",
+        "height": 1376,
+        "width": 262,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        144
+      ],
+      "id": "d61d32a3-8dd9-4e2e-b825-cb0679182837",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Notes",
+        "height": 1376,
+        "width": 262
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        144
+      ],
+      "id": "a405d8d2-c5e9-4c48-901c-28edb84fb7a4",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Tasks",
+        "height": 1376,
+        "width": 262,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        144
+      ],
+      "id": "ca97fc36-5dbf-4699-ba9f-0bf72949d8b1",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {
+    "Add multiple catalogs": [
+      {
+        "json": {
+          "_links": {
+            "self": {
+              "href": "https://tgctest.amocrm.ru/api/v4/catalogs"
+            }
+          },
+          "_embedded": {
+            "catalogs": [
+              {
+                "id": 12787,
+                "name": "Test Catalog",
+                "created_by": 13108862,
+                "updated_by": 13108862,
+                "created_at": 1760682370,
+                "updated_at": 1760682370,
+                "sort": 10,
+                "type": "regular",
+                "can_add_elements": true,
+                "can_show_in_cards": false,
+                "can_link_multiple": true,
+                "can_be_deleted": true,
+                "account_id": 32719502,
+                "request_id": "123",
+                "_links": {
+                  "self": {
+                    "href": "https://tgctest.amocrm.ru/api/v4/catalogs/12787"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        []
+      ]
+    },
+    "Get account info": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9d6e95ba-5a4d-4a97-ae31-b342eb95b708",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "207796555c538008e612d32a818bf5cfe856872d10b75a11dc15781656a3929c"
+  },
+  "id": "4jAQ1oemIbDcxmdP",
+  "tags": [
+    {
+      "createdAt": "2025-10-07T18:30:54.933Z",
+      "updatedAt": "2025-10-07T18:30:54.933Z",
+      "id": "C8qcujxxgQ2vmWXv",
+      "name": "TaritiGPT"
+    },
+    {
+      "createdAt": "2025-10-07T20:52:36.983Z",
+      "updatedAt": "2025-10-07T20:52:36.983Z",
+      "id": "riVDoKpJDdownhSU",
+      "name": "Incomplete"
+    }
+  ]
+}
