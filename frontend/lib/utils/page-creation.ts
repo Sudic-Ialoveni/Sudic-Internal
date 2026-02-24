@@ -120,42 +120,143 @@ export async function createPageViaAPI(options: CreatePageOptions, authToken?: s
 }
 
 /**
- * Example page configurations for common use cases
+ * Default page configurations
  */
-export const exampleConfigs = {
+export const defaultConfigs = {
   /**
-   * Analytics dashboard
+   * TaritiGPT Dashboard
    */
-  analyticsDashboard: (): PageConfig => ({
+  taritiGPT: (): PageConfig => ({
     layout: { cols: 12, gap: 4 },
     widgets: [
-      createWidget(WidgetType.AmoCRMAnalytics, 6),
-      createWidget(WidgetType.MoizvonkiAnalytics, 6),
-      createWidget(WidgetType.LiveLeadPreview, 12, { showActions: true }),
+      createWidget(WidgetType.TaritiGPTPrompt, 12, {
+        showHistory: true,
+        showExamples: true,
+      }),
+      createWidget(WidgetType.LiveLeadPreview, 6, { showActions: true }),
+      createWidget(WidgetType.LeadTimeline, 6),
     ],
   }),
 
   /**
-   * Lead management dashboard
+   * Website Analytics (Sudic.md)
    */
-  leadManagement: (): PageConfig => ({
+  websiteAnalytics: (): PageConfig => ({
     layout: { cols: 12, gap: 4 },
     widgets: [
-      createWidget(WidgetType.LiveLeadPreview, 8, { showActions: true }),
-      createWidget(WidgetType.LeadTimeline, 4),
-      createWidget(WidgetType.MessageLog, 12),
+      createWidget(WidgetType.CustomHTML, 6, {
+        title: 'Sudic 1 - Vizitatori',
+        html: '<div class="p-4 bg-white rounded-lg shadow"><h3 class="text-lg font-medium mb-2">Sudic 1 - Vizitatori</h3><p class="text-2xl font-bold">Se încarcă...</p></div>',
+      }),
+      createWidget(WidgetType.CustomHTML, 6, {
+        title: 'Sudic 2 - Vizitatori',
+        html: '<div class="p-4 bg-white rounded-lg shadow"><h3 class="text-lg font-medium mb-2">Sudic 2 - Vizitatori</h3><p class="text-2xl font-bold">Se încarcă...</p></div>',
+      }),
     ],
   }),
 
   /**
-   * AI assistant dashboard
+   * Moizvonki Analytics
    */
-  aiAssistant: (): PageConfig => ({
+  moizvonkiAnalytics: (): PageConfig => ({
     layout: { cols: 12, gap: 4 },
     widgets: [
-      createWidget(WidgetType.TaritiGPTPrompt, 12),
-      createWidget(WidgetType.LiveLeadPreview, 6),
-      createWidget(WidgetType.AmoCRMAnalytics, 6),
+      createWidget(WidgetType.MoizvonkiAnalytics, 4, {
+        title: 'Sunete de intrare',
+        dateRange: '7d',
+        type: 'inbound'
+      }),
+      createWidget(WidgetType.MoizvonkiAnalytics, 4, {
+        title: 'Sunete ratate',
+        dateRange: '7d',
+        type: 'missed'
+      }),
+      createWidget(WidgetType.MoizvonkiAnalytics, 4, {
+        title: 'Sunete de ieșire',
+        dateRange: '7d',
+        type: 'outbound'
+      }),
+    ],
+  }),
+
+  /**
+   * AmoCRM Analytics
+   */
+  amocrmAnalytics: (): PageConfig => ({
+    layout: { cols: 12, gap: 4 },
+    widgets: [
+      createWidget(WidgetType.AmoCRMAnalytics, 3, {
+        title: 'Total Imobile',
+        metric: 'total_properties',
+      }),
+      createWidget(WidgetType.AmoCRMAnalytics, 3, {
+        title: 'M² Total',
+        metric: 'total_area',
+      }),
+      createWidget(WidgetType.AmoCRMAnalytics, 3, {
+        title: 'Imobile Tranzacționate',
+        metric: 'sold_properties',
+      }),
+      createWidget(WidgetType.AmoCRMAnalytics, 3, {
+        title: 'M² Tranzacționat',
+        metric: 'sold_area',
+      }),
+      createWidget(WidgetType.AmoCRMAnalytics, 6, {
+        title: 'Imobile Rămase',
+        metric: 'remaining_properties',
+      }),
+      createWidget(WidgetType.AmoCRMAnalytics, 6, {
+        title: 'M² Rămași',
+        metric: 'remaining_area',
+      }),
+    ],
+  }),
+
+  /**
+   * AI Custom Page Builder
+   */
+  aiPageBuilder: (): PageConfig => ({
+    layout: { cols: 12, gap: 4 },
+    widgets: [
+      createWidget(WidgetType.CustomHTML, 12, {
+        title: 'AI Page Builder',
+        html: `
+          <div class="p-6 bg-white rounded-lg shadow">
+            <h2 class="text-2xl font-bold mb-4">AI Page Builder</h2>
+            <p class="mb-4">Creează pagini personalizate folosind AI-ul nostru.</p>
+            <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+              Creează Pagină Nouă
+            </button>
+          </div>
+        `,
+      }),
+    ],
+  }),
+
+  /**
+   * Custom Pages Manager
+   */
+  customPages: (): PageConfig => ({
+    layout: { cols: 12, gap: 4 },
+    widgets: [
+      createWidget(WidgetType.CustomHTML, 12, {
+        title: 'Gestionare Pagini Personalizate',
+        html: `
+          <div class="p-6 bg-white rounded-lg shadow">
+            <h2 class="text-2xl font-bold mb-4">Pagini Personalizate</h2>
+            <p class="mb-4">Gestionează toate paginile tale personalizate într-un singur loc.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="custom-pages-list">
+              <div class="p-4 border rounded-lg">
+                <h3 class="font-medium">Fără pagini personalizate</h3>
+                <p class="text-sm text-gray-500">Apasă pe butonul de mai jos pentru a crea o pagină nouă</p>
+              </div>
+            </div>
+            <button class="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+              + Pagină Nouă
+            </button>
+          </div>
+        `,
+      }),
     ],
   }),
 }

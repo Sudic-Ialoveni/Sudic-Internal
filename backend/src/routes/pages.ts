@@ -46,6 +46,13 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res) => {
 // POST /api/pages
 router.post('/', requireAuth, async (req: AuthenticatedRequest, res) => {
   try {
+    if (req.body?.config == null) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        details: 'Request body must include "config" (object with "widgets" array).',
+      })
+    }
+
     const supabase = createClient()
     const authHeader = req.headers.authorization
     if (authHeader) {
@@ -53,7 +60,14 @@ router.post('/', requireAuth, async (req: AuthenticatedRequest, res) => {
       await supabase.auth.setSession({ access_token: token, refresh_token: '' })
     }
 
-    const config = PageConfigSchema.parse(req.body.config)
+    const parsed = PageConfigSchema.safeParse(req.body.config)
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: 'Invalid page config',
+        details: parsed.error.message,
+      })
+    }
+    const config = parsed.data
     
     const slug = req.body.slug?.toLowerCase().replace(/[^a-z0-9-]/g, '-') ||
                  req.body.title?.toLowerCase().replace(/[^a-z0-9-]/g, '-') ||

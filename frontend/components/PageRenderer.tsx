@@ -24,7 +24,7 @@ export default function PageRenderer({ config }: PageRendererProps) {
       {config.widgets.map((widget) => (
         <div
           key={widget.id}
-          className="bg-white rounded-lg shadow-sm border p-4"
+          className="bg-slate-800/50 border border-slate-700 rounded-xl p-4"
           style={{
             gridColumn: `span ${widget.colSpan} / span ${widget.colSpan}`,
             minHeight: '200px',

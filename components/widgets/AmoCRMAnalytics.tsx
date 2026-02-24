@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { apiFetch } from '@/lib/api'
 import { WidgetProps } from './WidgetRegistry'
 
 interface AmoCRMAnalyticsData {
@@ -19,11 +20,8 @@ export default function AmoCRMAnalytics({ settings }: WidgetProps) {
   async function fetchAnalytics() {
     try {
       setLoading(true)
-      const response = await fetch('/api/analytics/amo')
-      if (!response.ok) throw new Error('Failed to fetch')
-      
-      const result = await response.json()
-      setData(result)
+      const result = await apiFetch('/api/analytics/amo')
+      setData(result as AmoCRMAnalyticsData)
     } catch (error) {
       console.error('Error fetching AmoCRM analytics:', error)
     } finally {

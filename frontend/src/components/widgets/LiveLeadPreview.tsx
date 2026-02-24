@@ -5,71 +5,50 @@ import { WidgetProps } from './WidgetRegistry'
 import { format } from 'date-fns'
 
 interface LiveLeadPreviewSettings {
-  initialFilter?: {
-    status?: string
-    source?: string
-  }
+  initialFilter?: { status?: string; source?: string }
   showActions?: boolean
 }
 
-export default function LiveLeadPreview({ settings }: WidgetProps) {
-  const [leads, setLeads] = useState<Lead[]>([])
-  const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<LeadStatus | 'all'>(
-    (settings as LiveLeadPreviewSettings)?.initialFilter?.status || 'all'
-  )
+const STATUS_STYLES: Record<string, string> = {
+  new:       'bg-emerald-500/15 text-emerald-300 border-emerald-500/20',
+  accepted:  'bg-sky-500/15 text-sky-300 border-sky-500/20',
+  rejected:  'bg-rose-500/15 text-rose-300 border-rose-500/20',
+  assigned:  'bg-violet-500/15 text-violet-300 border-violet-500/20',
+  processed: 'bg-amber-500/15 text-amber-300 border-amber-500/20',
+  forwarded: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/20',
+}
 
+export default function LiveLeadPreview({ settings }: WidgetProps) {
   const config = (settings as LiveLeadPreviewSettings) || {}
   const showActions = config.showActions !== false
 
+  const [leads, setLeads] = useState<Lead[]>([])
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState<LeadStatus | 'all'>(
+    (config.initialFilter?.status as LeadStatus | 'all') || 'all',
+  )
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
+
   useEffect(() => {
     fetchLeads()
-
     const channel = supabase
-      .channel('leads-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'leads',
-        },
-        (payload) => {
-          console.log('Realtime update:', payload)
-          fetchLeads()
-        }
-      )
+      .channel('leads-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => fetchLeads())
       .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => { supabase.removeChannel(channel) }
   }, [filter])
 
   async function fetchLeads() {
     try {
       setLoading(true)
-      let query = supabase
-        .from('leads')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50)
-
-      if (filter !== 'all') {
-        query = query.eq('status', filter)
-      }
-
-      if (config.initialFilter?.source) {
-        query = query.eq('source', config.initialFilter.source)
-      }
-
+      let query = supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(50)
+      if (filter !== 'all') query = query.eq('status', filter)
+      if (config.initialFilter?.source) query = query.eq('source', config.initialFilter.source)
       const { data, error } = await query
-
       if (error) throw error
       setLeads(data || [])
-    } catch (error) {
-      console.error('Error fetching leads:', error)
+    } catch {
+      /* silent */
     } finally {
       setLoading(false)
     }
@@ -77,42 +56,35 @@ export default function LiveLeadPreview({ settings }: WidgetProps) {
 
   async function updateLeadStatus(id: string, status: LeadStatus) {
     try {
-      const { error } = await supabase
-        .from('leads')
-        .update({ status })
-        .eq('id', id)
-
-      if (error) throw error
-    } catch (error) {
-      console.error('Error updating lead:', error)
-      alert('Failed to update lead')
-    }
-  }
-
-  async function forwardToAmoCRM(id: string) {
-    try {
-      const response = await fetch(`/api/leads/${id}/forward-amo`, {
-        method: 'POST',
+      setActionLoading(id)
+      const { supabase: sb } = await import('@/lib/supabase/client')
+      const { data: { session } } = await sb.auth.getSession()
+      const res = await fetch(`/api/leads/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+        body: JSON.stringify({ status }),
       })
-
-      if (!response.ok) throw new Error('Failed to forward')
-      
-      const data = await response.json()
-      alert('Lead forwarded to AmoCRM')
-    } catch (error) {
-      console.error('Error forwarding lead:', error)
-      alert('Failed to forward lead')
+      if (!res.ok) throw new Error('Failed to update')
+      fetchLeads()
+    } catch {
+      /* silent */
+    } finally {
+      setActionLoading(null)
     }
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Live Leads</h2>
+    <div className="flex flex-col h-full min-h-0 p-5">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4 flex-shrink-0">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Live</p>
+          <h3 className="text-sm font-semibold text-slate-200 mt-0.5">Leads</h3>
+        </div>
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value as LeadStatus | 'all')}
-          className="px-3 py-1 border rounded text-sm"
+          onChange={e => setFilter(e.target.value as LeadStatus | 'all')}
+          className="bg-slate-700/60 border border-slate-600/50 text-slate-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-slate-500"
         >
           <option value="all">All</option>
           <option value="new">New</option>
@@ -124,86 +96,74 @@ export default function LiveLeadPreview({ settings }: WidgetProps) {
         </select>
       </div>
 
-      {loading ? (
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-gray-500">Loading leads...</p>
-        </div>
-      ) : leads.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-gray-500">No leads found</p>
-        </div>
-      ) : (
-        <div className="flex-1 overflow-y-auto space-y-2">
-          {leads.map((lead) => (
-            <div
-              key={lead.id}
-              className="p-4 border rounded-lg hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800">
-                      {lead.source}
-                    </span>
-                    <span className={`px-2 py-1 text-xs font-medium rounded ${
-                      lead.status === 'new' ? 'bg-green-100 text-green-800' :
-                      lead.status === 'accepted' ? 'bg-blue-100 text-blue-800' :
-                      lead.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+      {/* Lead list */}
+      <div className="flex-1 min-h-0 overflow-y-auto space-y-2" style={{ scrollbarWidth: 'thin', scrollbarColor: '#334155 transparent' }}>
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="flex gap-1">
+              {[0, 100, 200].map(d => (
+                <span key={d} className="h-1.5 w-1.5 rounded-full bg-slate-600 animate-bounce" style={{ animationDelay: `${d}ms` }} />
+              ))}
+            </div>
+          </div>
+        ) : leads.length === 0 ? (
+          <div className="flex items-center justify-center py-8">
+            <p className="text-sm text-slate-500">No leads found</p>
+          </div>
+        ) : (
+          leads.map(lead => (
+            <div key={lead.id} className="bg-slate-700/30 border border-slate-700/50 rounded-lg p-3 hover:border-slate-600/60 transition-colors">
+              <div className="flex items-start gap-2 min-w-0">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+                    {lead.source && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-slate-600/50 text-slate-300 border border-slate-600/30">
+                        {lead.source}
+                      </span>
+                    )}
+                    <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded border ${STATUS_STYLES[lead.status] ?? 'bg-slate-600/30 text-slate-400 border-slate-600/20'}`}>
                       {lead.status}
                     </span>
                   </div>
-                  
-                  {lead.name && (
-                    <p className="font-medium text-gray-900">{lead.name}</p>
-                  )}
-                  {lead.phone && (
-                    <p className="text-sm text-gray-600">📞 {lead.phone}</p>
-                  )}
-                  {lead.email && (
-                    <p className="text-sm text-gray-600">✉️ {lead.email}</p>
-                  )}
+
+                  {lead.name && <p className="text-sm font-medium text-slate-200 truncate">{lead.name}</p>}
+                  {lead.phone && <p className="text-xs text-slate-400 mt-0.5">{lead.phone}</p>}
+                  {lead.email && <p className="text-xs text-slate-400 truncate">{lead.email}</p>}
                   {lead.message && (
-                    <p className="text-sm text-gray-700 mt-2">{lead.message}</p>
+                    <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">{lead.message}</p>
                   )}
-                  <p className="text-xs text-gray-400 mt-2">
-                    {format(new Date(lead.created_at), 'PPp')}
+                  <p className="text-[10px] text-slate-600 mt-1.5">
+                    {format(new Date(lead.created_at), 'dd MMM, HH:mm')}
                   </p>
                 </div>
 
                 {showActions && (
-                  <div className="flex flex-col gap-2 ml-4">
+                  <div className="flex flex-col gap-1 flex-shrink-0">
                     {lead.status === 'new' && (
                       <>
                         <button
                           onClick={() => updateLeadStatus(lead.id, 'accepted')}
-                          className="px-3 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
+                          disabled={actionLoading === lead.id}
+                          className="px-2 py-1 text-[10px] font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 rounded hover:bg-emerald-500/25 transition-colors disabled:opacity-40"
                         >
                           Accept
                         </button>
                         <button
                           onClick={() => updateLeadStatus(lead.id, 'rejected')}
-                          className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                          disabled={actionLoading === lead.id}
+                          className="px-2 py-1 text-[10px] font-medium bg-rose-500/15 text-rose-300 border border-rose-500/20 rounded hover:bg-rose-500/25 transition-colors disabled:opacity-40"
                         >
                           Reject
                         </button>
                       </>
                     )}
-                    <button
-                      onClick={() => forwardToAmoCRM(lead.id)}
-                      className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                      Forward to AmoCRM
-                    </button>
                   </div>
                 )}
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   )
 }
-

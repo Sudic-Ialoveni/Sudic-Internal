@@ -13,15 +13,15 @@ export default function DashboardPage() {
 
   async function loadDefaultPage() {
     try {
-      const { data: page } = await supabase
+      const { data: page, error: pageError } = await supabase
         .from('pages')
         .select('*')
         .eq('slug', 'dashboard')
         .eq('published', true)
-        .single()
+        .maybeSingle<{ config: PageConfig }>()
 
-      if (page) {
-        setConfig(page.config as PageConfig)
+      if (page && !pageError) {
+        setConfig(page.config)
       } else {
         setConfig({
           layout: { cols: 12, gap: 4 },

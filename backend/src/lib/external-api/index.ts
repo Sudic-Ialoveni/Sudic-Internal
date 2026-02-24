@@ -1,0 +1,5 @@
+export { parsePath, VARIABLE_REGISTRY, getAllVariables, findVariable } from './registry.js'
+export { resolve } from './resolver.js'
+export type { ResolveInput } from './resolver.js'
+export type { VariableDefinition } from './types.js'
+export type { ParsedReference, ExternalSource, ResolveResult } from './types.js'

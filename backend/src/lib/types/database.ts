@@ -160,6 +160,55 @@ export interface Database {
           updated_at?: string
         }
       }
+      ai_chats: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          messages: Json
+          share_token: string | null
+          share_created_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title?: string
+          messages?: Json
+          share_token?: string | null
+          share_created_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          messages?: Json
+          share_token?: string | null
+          share_created_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      user_preferences: {
+        Row: {
+          user_id: string
+          preferences: Json
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          preferences?: Json
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          preferences?: Json
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

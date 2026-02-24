@@ -1,10 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/lib/types/database'
+import { env, hasEnvVars } from '@/lib/env'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
-
-export const hasEnvVars = !!(supabaseUrl && supabaseAnonKey)
+export { hasEnvVars }
 
 if (!hasEnvVars) {
   console.error('⚠️ Missing Supabase environment variables!')
@@ -15,8 +13,8 @@ if (!hasEnvVars) {
 
 // Create client - will work even with placeholder values (auth will just fail gracefully)
 export const supabase = createClient<Database>(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDUxOTIwMDAsImV4cCI6MTk2MDc2ODAwMH0.placeholder',
+  env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co',
+  env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDUxOTIwMDAsImV4cCI6MTk2MDc2ODAwMH0.placeholder',
   {
     auth: {
       persistSession: true,

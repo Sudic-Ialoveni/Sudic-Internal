@@ -1,0 +1,57 @@
+.headline {
+    display: block;
+    margin: 10px 0 25px 0;
+    border-bottom: 1px dotted #e4e9f0;
+}
+
+.headline h2, .headline h3, .headline h4 {
+    margin: 0 0 -2px 0;
+    padding-bottom: 5px;
+    display: inline-block;
+    border-bottom:2px solid rgb(10, 191, 83);
+}
+
+blockquote.bq-green {
+    border-color: #72c02c;
+}
+blockquote {
+    padding: 5px 15px;
+    border-left-width: 2px;
+}
+blockquote {
+    padding: 10px 20px;
+    margin: 0 0 20px;
+    font-size: 17.5px;
+    border-left: 5px solid #eee;
+}
+
+.accordion-header-sm .accordion-button {
+	padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+}
+
+.form-control-md {
+	padding: .375rem .75rem;
+}
+
+.form-control {
+	border: 1px solid #ced4da;
+}
+
+.dropdown-toggle::after {
+	border-top: 0;
+}
+
+.accordion-sp .accordion-button {
+    padding: 0.5rem 2rem;
+}
+
+.navbar-main {
+    background-color: #3d3d48;
+    --bs-navbar-color: rgba(255, 255, 255, 0.85);
+    --bs-navbar-brand-margin-end: 3rem;
+}
+
+.form-text {
+  margin-top: .25rem;
+}

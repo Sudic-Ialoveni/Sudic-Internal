@@ -16,6 +16,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    strictPort: true, // fail if 3000 is in use (don't use 3001 — that's the backend)
     proxy: {
       '/api': {
         target: 'http://localhost:3001',

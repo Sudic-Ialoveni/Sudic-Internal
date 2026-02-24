@@ -8,17 +8,27 @@ import CustomHTML from './CustomHTML'
 import MessageLog from './MessageLog'
 import LeadTimeline from './LeadTimeline'
 import MissingWidget from './MissingWidget'
+import StatCard from './StatCard'
+import BarChart from './BarChart'
+import LineChart from './LineChart'
+import DonutChart from './DonutChart'
 
 export interface WidgetProps {
   settings?: Record<string, any>
   widgetId: string
 }
 
-// Widget registry - maps widget types to components
 export const WIDGET_REGISTRY: Record<string, ComponentType<WidgetProps>> = {
+  // Data widgets
   LiveLeadPreview,
   AmoCRMAnalytics,
   MoizvonkiAnalytics,
+  // Chart widgets
+  StatCard,
+  BarChart,
+  LineChart,
+  DonutChart,
+  // Utility widgets
   TaritiGPTPrompt,
   CustomHTML,
   MessageLog,
@@ -33,4 +43,3 @@ export function renderWidget(config: WidgetConfig) {
   const Widget = getWidget(config.type)
   return <Widget key={config.id} widgetId={config.id} settings={config.settings} />
 }
-

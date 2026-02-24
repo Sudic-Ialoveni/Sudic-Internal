@@ -3,35 +3,40 @@ import { renderWidget } from './widgets/WidgetRegistry'
 
 interface PageRendererProps {
   config: PageConfig
+  title?: string
+  description?: string
 }
 
-export default function PageRenderer({ config }: PageRendererProps) {
-  const layout = config.layout || { cols: 12, gap: 4 }
-  const gap = layout.gap || 4
-  const cols = layout.cols || 12
+export default function PageRenderer({ config, title, description }: PageRendererProps) {
+  const gap = config.layout?.gap ?? 4
 
   return (
-    <div 
-      className="p-4"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-        gap: `${gap * 0.25}rem`,
-      }}
-    >
-      {config.widgets.map((widget) => (
-        <div
-          key={widget.id}
-          className="bg-white rounded-lg shadow-sm border p-4"
-          style={{
-            gridColumn: `span ${widget.colSpan} / span ${widget.colSpan}`,
-            minHeight: '200px',
-          }}
-        >
-          {renderWidget(widget)}
+    <div className="flex-1 overflow-auto bg-slate-900">
+      {(title || description) && (
+        <div className="px-6 pt-6 pb-2">
+          {title && <h1 className="text-xl font-semibold text-white">{title}</h1>}
+          {description && <p className="text-sm text-slate-400 mt-0.5">{description}</p>}
         </div>
-      ))}
+      )}
+
+      <div
+        className="p-6 grid grid-cols-12"
+        style={{ gap: `${gap * 0.25}rem` }}
+      >
+        {config.widgets.map((widget) => {
+          const colSpan = Math.min(Math.max(widget.colSpan ?? 12, 1), 12)
+
+          return (
+            <div
+              key={widget.id}
+              className="bg-slate-800 border border-slate-700/60 rounded-xl overflow-hidden flex flex-col min-w-0"
+              style={{ gridColumn: `span ${colSpan}` }}
+            >
+              {renderWidget(widget)}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
-

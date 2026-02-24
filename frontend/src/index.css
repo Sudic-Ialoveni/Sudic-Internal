@@ -2,16 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+:root,
+[data-theme="dark"] {
+  --app-bg: 15 23 42; /* slate-900 */
+  --app-sidebar: 2 6 23; /* slate-950 */
+  --app-text: 248 250 252; /* slate-50 */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+[data-theme="light"] {
+  --app-bg: 241 245 249; /* slate-100 */
+  --app-sidebar: 226 232 240; /* slate-200 */
+  --app-text: 15 23 42;
+}
+
+:root {
+  --background: #0f172a;
+  --foreground: #f8fafc;
 }
 
 body {
@@ -26,5 +32,78 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Chat message markdown rendering */
+.prose-chat h1,
+.prose-chat h2,
+.prose-chat h3 {
+  @apply font-semibold text-white mt-3 mb-1;
+}
+.prose-chat h1 { @apply text-base; }
+.prose-chat h2 { @apply text-sm; }
+.prose-chat h3 { @apply text-sm; }
+
+.prose-chat p {
+  @apply my-1 leading-relaxed;
+}
+
+.prose-chat ul,
+.prose-chat ol {
+  @apply my-1 pl-4 space-y-0.5;
+}
+
+.prose-chat ul { @apply list-disc; }
+.prose-chat ol { @apply list-decimal; }
+
+.prose-chat li { @apply text-slate-200; }
+
+.prose-chat code {
+  @apply text-xs font-mono bg-slate-800/80 text-indigo-300 px-1.5 py-0.5 rounded;
+}
+
+.prose-chat pre {
+  @apply my-2 rounded-xl bg-slate-900 border border-white/5 p-3 overflow-x-auto;
+}
+
+.prose-chat pre code {
+  @apply bg-transparent text-slate-200 p-0 text-xs;
+}
+
+.prose-chat table {
+  @apply w-full text-xs border-collapse my-2;
+}
+
+.prose-chat th {
+  @apply text-left px-2 py-1.5 bg-slate-800 text-slate-300 font-medium border border-white/10;
+}
+
+.prose-chat td {
+  @apply px-2 py-1.5 border border-white/5 text-slate-300;
+}
+
+.prose-chat tr:nth-child(even) td {
+  @apply bg-white/[0.02];
+}
+
+.prose-chat strong {
+  @apply font-semibold text-white;
+}
+
+.prose-chat em {
+  @apply italic text-slate-300;
+}
+
+.prose-chat hr {
+  @apply border-white/10 my-3;
+}
+
+/* Mermaid diagrams in chat */
+.prose-chat .mermaid {
+  @apply my-4 flex justify-center;
+}
+.prose-chat .mermaid svg {
+  max-width: 100%;
+  height: auto;
 }
 

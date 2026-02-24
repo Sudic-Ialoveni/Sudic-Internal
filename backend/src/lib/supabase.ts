@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { Database } from './types/database.js'
 
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || ''
@@ -7,11 +7,13 @@ const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('⚠️ Missing Supabase environment variables!')
+} else {
+  console.log('✅ Supabase environment variables loaded')
 }
 
 // Client for authenticated requests (uses anon key)
 export function createClient() {
-  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
       persistSession: false,
@@ -25,7 +27,7 @@ export function createServiceClient() {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for service operations')
   }
   
-  return createClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
+  return createSupabaseClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

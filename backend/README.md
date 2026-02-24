@@ -75,6 +75,19 @@ The frontend automatically includes this token in all API requests.
 - `FRONTEND_URL` - Frontend URL for CORS (default: http://localhost:3000)
 - `WEBHOOK_SECRET_*` - Optional webhook secrets for HMAC validation
 
+**AmoCRM** (optional – AI tools, forward lead to AmoCRM):
+
+- `AMOCRM_BASE_URL` - e.g. `https://yoursubdomain.amocrm.com`
+- `AMOCRM_API_KEY` - OAuth access token or long-lived token
+
+**Moizvonki** (optional – AI tools):
+
+- `MOIZVONKI_API_KEY` - From Moizvonki → Настройки → Интеграция → Параметры API
+- `MOIZVONKI_USER` - Your Moizvonki account email
+- `MOIZVONKI_BASE_URL` - Optional (default: `https://app.moizvonki.ru/api/v1`)
+
+See [docs/AMOCRM_MOIZVONKI_SETUP.md](../docs/AMOCRM_MOIZVONKI_SETUP.md) for step-by-step API key setup.
+
 ## Scripts
 
 - `npm run dev` - Start development server with hot reload
