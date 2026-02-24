@@ -1,5 +1,27 @@
 # Hosting Sudic Internal
 
+## Deploy to Vercel (all-in-one)
+
+1. **Install Vercel CLI** (optional): `npm i -g vercel`
+2. **From repo root**, run:
+   ```bash
+   vercel
+   ```
+   Or connect this repo in [Vercel Dashboard](https://vercel.com/new) (import Git repository; leave root as project root).
+3. **Set environment variables** in Vercel (Project → Settings → Environment Variables). Add for **Production** (and Preview if you use branches):
+   - `VITE_SUPABASE_URL` – your Supabase project URL  
+   - `VITE_SUPABASE_ANON_KEY` – Supabase anon key  
+   - `VITE_BACKEND_URL` – **your Vercel deployment URL** (e.g. `https://sudic-internal.vercel.app`) so the frontend calls the same origin for the API  
+   - `SUPABASE_URL` – same as above  
+   - `SUPABASE_ANON_KEY` – same as above  
+   - `SUPABASE_SERVICE_ROLE_KEY` – from Supabase (Dashboard → Settings → API)  
+   - `FRONTEND_URL` – same as `VITE_BACKEND_URL`  
+   - Optional: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, AmoCRM/Moizvonki vars (see `backend/.env.example`)
+4. **Redeploy** after adding env vars (Deployments → … → Redeploy), or push a commit.
+5. **Check**: Open `https://your-project.vercel.app/health` – should return `{"status":"ok",...}`. Then open the app URL and log in.
+
+---
+
 ## Can it fit on Vercel free tier?
 
 **Yes**, with one important caveat.
@@ -35,12 +57,15 @@ So:
 2. **Environment variables**  
    Set in Vercel dashboard (Project → Settings → Environment Variables):
    - **Frontend (build + runtime):**  
-     `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_BACKEND_URL` (e.g. `https://your-domain.vercel.app` so API calls use same origin).
+     `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_BACKEND_URL` = your deployment URL (e.g. `https://sudic-internal.vercel.app`) so API calls use the same origin.
    - **Backend (serverless):**  
-     Same as local: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `FRONTEND_URL`, and any of: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, AmoCRM/Moizvonki vars, webhook secrets.
+     Same as local: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `FRONTEND_URL` (your frontend URL), and any of: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, AmoCRM/Moizvonki vars, webhook secrets.
 
 3. **Deploy**  
-   Push to Git and connect the repo to Vercel (or run `vercel` from the repo root). Use the root `vercel.json` and `api/` handler included in this repo.
+   From repo root: `vercel` (or connect the repo in the Vercel dashboard). The root `vercel.json` builds backend then frontend and routes `/api/*` and `/health` to the Express app.
+
+4. **If the serverless function fails** (e.g. "Cannot find module" for the backend):  
+   Use **Option B** instead—deploy the frontend on Vercel (set Root Directory to `frontend`) and run the backend on Railway, Render, Fly.io, or your server.
 
 ---
 
