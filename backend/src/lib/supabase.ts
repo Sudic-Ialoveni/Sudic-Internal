@@ -1,4 +1,4 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createClient as createSupabaseClient, SupabaseClient } from '@supabase/supabase-js'
 import { Database } from './types/database.js'
 
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || ''
@@ -12,7 +12,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Client for authenticated requests (uses anon key)
-export function createClient() {
+export function createClient(): SupabaseClient<Database> {
   return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
@@ -22,7 +22,7 @@ export function createClient() {
 }
 
 // Service role client for webhooks and admin operations
-export function createServiceClient() {
+export function createServiceClient(): SupabaseClient<Database> {
   if (!supabaseServiceRoleKey) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for service operations')
   }

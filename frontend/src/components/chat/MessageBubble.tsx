@@ -72,7 +72,7 @@ export function MessageBubble({ message, onApprove, onReject }: MessageBubblePro
     const nodes = contentRef.current.querySelectorAll('.mermaid')
     if (nodes.length) {
       initMermaid()
-      mermaid.run({ nodes }).catch(() => {})
+      mermaid.run({ nodes: Array.from(nodes) as HTMLElement[] }).catch(() => {})
     }
   }, [message.blocks])
 
