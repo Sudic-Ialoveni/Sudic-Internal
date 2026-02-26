@@ -82,8 +82,8 @@ export default function BarChart({ settings }: WidgetProps) {
           <p className="text-xs text-slate-600">No data</p>
         </div>
       ) : (
-        <div className="flex-1 min-h-0">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="flex-1 min-h-[200px]">
+          <ResponsiveContainer width="100%" height="100%" minHeight={200}>
             <ReBarChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 4 }} barCategoryGap="30%">
               {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />}
               <XAxis

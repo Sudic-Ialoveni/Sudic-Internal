@@ -43,10 +43,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   async function checkUser() {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error) {
+        // Invalid/expired refresh token or other auth error – clear session so user can re-login
+        await supabase.auth.signOut()
+        setUser(null)
+      } else {
+        setUser(user)
+      }
     } catch (error) {
       console.error('Error checking user:', error)
+      await supabase.auth.signOut()
       setUser(null)
     } finally {
       setLoading(false)

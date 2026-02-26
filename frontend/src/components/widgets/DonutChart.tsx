@@ -87,8 +87,8 @@ export default function DonutChart({ settings }: WidgetProps) {
           <p className="text-xs text-slate-600">No data</p>
         </div>
       ) : (
-        <div className="flex-1 min-h-0">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="flex-1 min-h-[200px]">
+          <ResponsiveContainer width="100%" height="100%" minHeight={200}>
             <PieChart>
               <Pie
                 data={chartData}

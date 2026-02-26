@@ -1,15 +1,12 @@
 {
   "version": 2,
+  "framework": "vite",
   "buildCommand": "cd backend && npm run build && cd ../frontend && npm run build",
   "outputDirectory": "frontend/dist",
   "installCommand": "npm install && (cd frontend && npm ci)",
   "rewrites": [
-    { "source": "/health", "destination": "/api/health" }
-  ],
-  "functions": {
-    "api/[[...path]].ts": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
-  }
+    { "source": "/health", "destination": "/api/health" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
 }

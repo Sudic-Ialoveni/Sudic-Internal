@@ -1,9 +1,8 @@
 /**
- * Vercel serverless handler: forwards all /api and /health requests to the Express app.
+ * Vercel serverless: catch-all for /api/* (e.g. /api/user/preferences).
+ * With framework=vite + outputDirectory, this may not be invoked on Vercel; then use standalone backend or see docs/VERCEL_DEPLOY.md.
  */
-// @ts-expect-error - sudic-internal-backend is a local file: dependency, resolved at runtime
 import { createApp } from 'sudic-internal-backend/app'
 
 const app = createApp()
-
 export default app

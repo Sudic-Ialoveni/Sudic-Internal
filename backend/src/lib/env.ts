@@ -43,9 +43,26 @@ function loadEnv(): Env {
   }
   const parsed = envSchema.safeParse(raw)
   if (!parsed.success) {
-    console.error('❌ Invalid environment variables:')
-    console.error(parsed.error.flatten().fieldErrors)
-    process.exit(1)
+    console.warn('⚠️ Invalid environment variables (using defaults):', parsed.error.flatten().fieldErrors)
+    // Avoid process.exit(1) so serverless (e.g. Vercel) can start and return degraded health
+    const defaults: Env = {
+      NODE_ENV: 'development',
+      PORT: 3001,
+      FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+      SUPABASE_URL: process.env.SUPABASE_URL || '',
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || '',
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+      ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || '',
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
+      AMOCRM_BASE_URL: process.env.AMOCRM_BASE_URL || '',
+      AMOCRM_API_KEY: process.env.AMOCRM_API_KEY || '',
+      MOIZVONKI_API_KEY: process.env.MOIZVONKI_API_KEY || '',
+      MOIZVONKI_BASE_URL: process.env.MOIZVONKI_BASE_URL || '',
+      MOIZVONKI_USER: process.env.MOIZVONKI_USER || '',
+      WEBHOOK_SECRET_AMOCRM: process.env.WEBHOOK_SECRET_AMOCRM || '',
+      WEBHOOK_SECRET_MOIZVONKI: process.env.WEBHOOK_SECRET_MOIZVONKI || '',
+    }
+    return defaults
   }
   if (!parsed.data.SUPABASE_URL || !parsed.data.SUPABASE_ANON_KEY) {
     console.warn('⚠️ SUPABASE_URL and SUPABASE_ANON_KEY are missing; auth and DB will not work.')

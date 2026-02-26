@@ -6,6 +6,24 @@ Replace placeholder values with your real ones.
 
 ---
 
+## Your Vercel env vars (canonical list)
+
+- `AMOCRM_BASE_URL`
+- `AMOCRM_API_KEY`
+- `MOIZVONKI_API_KEY`
+- `MOIZVONKI_USER`
+- `MOIZVONKI_BASE_URL`
+- `VITE_BACKEND_URL` (e.g. `https://sudic-internal.vercel.app`)
+- `FRONTEND_URL` (e.g. `https://sudic-internal.vercel.app`)
+- `ANTHROPIC_API_KEY`
+- `CLAUDE_MODEL` (optional; defaults to `claude-sonnet-4-6`)
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+**API (serverless) also needs** (same values as Supabase): `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`. Add these in Vercel if you use auth/DB from the API.
+
+---
+
 ## Required (paste these, then fill in your values)
 
 | Name | Value | Notes |

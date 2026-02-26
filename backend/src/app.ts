@@ -44,6 +44,18 @@ export function createApp(): express.Express {
   }))
   app.use(express.json())
 
+  // On Vercel, the catch-all handler may receive path without /api prefix; normalize so Express routes match.
+  if (process.env.VERCEL) {
+    app.use((req, _res, next) => {
+      const u = req.url ?? ''
+      const pathOnly = u.split('?')[0]
+      if (pathOnly && !pathOnly.startsWith('/api') && !pathOnly.startsWith('/health')) {
+        req.url = '/api' + (pathOnly.startsWith('/') ? pathOnly : '/' + pathOnly) + (u.includes('?') ? '?' + u.split('?')[1] : '')
+      }
+      next()
+    })
+  }
+
   const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
@@ -72,9 +84,13 @@ export function createApp(): express.Express {
       timestamp: new Date().toISOString(),
     }
     try {
-      const supabase = createServiceClient()
-      const { error } = await supabase.from('pages').select('id').limit(1).maybeSingle()
-      result.supabase = error ? 'degraded' : 'ok'
+      if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+        result.supabase = 'degraded'
+      } else {
+        const supabase = createServiceClient()
+        const { error } = await supabase.from('pages').select('id').limit(1).maybeSingle()
+        result.supabase = error ? 'degraded' : 'ok'
+      }
     } catch {
       result.supabase = 'degraded'
     }
