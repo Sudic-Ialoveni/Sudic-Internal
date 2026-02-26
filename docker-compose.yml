@@ -1,0 +1,20 @@
+# Sudic Internal – backend only (frontend stays on Vercel).
+# Usage:
+#   cp backend/.env.example backend/.env   # edit with your values
+#   docker compose up -d
+# Then expose via Cloudflare Tunnel and set VITE_BACKEND_URL in Vercel to the tunnel URL.
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sudic-internal-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
