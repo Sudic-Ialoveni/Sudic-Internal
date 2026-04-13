@@ -13,7 +13,7 @@ const INITIAL_MESSAGE: UIMessage = {
   role: 'assistant',
   blocks: [{
     type: 'text',
-    text: "Hey, I'm **Tariti** — your operations AI for Sudic.\n\nI have full access to your dashboard, leads, analytics, AmoCRM, and Moizvonki. Ask me to analyze data, create pages, update leads, or anything else. I'll always ask before making changes.",
+    text: "Hey, I'm **Tariti** — your operations AI for Sudic.\n\nI have full access to your dashboard, leads, analytics, AmoCRM, and Moizvonki. Ask me to analyze data, create pages, update leads, or anything else. I'll always ask before making changes.\n\n**Personalize:** Open **Settings** (sidebar) for your name, AI memory, personality, and API keys — or send **`/setup`** here for a guided chat onboarding.",
   }],
   timestamp: new Date(),
 }
@@ -39,6 +39,7 @@ function normalizeErrorMessage(raw: string): string {
 }
 
 const SUGGESTIONS = [
+  { icon: '⚙️', text: '/setup' },
   { icon: '📊', text: "Show me today's new leads" },
   { icon: '📞', text: 'Give me an overview of call analytics this week' },
   { icon: '✨', text: 'Create a leads dashboard page with analytics widgets' },

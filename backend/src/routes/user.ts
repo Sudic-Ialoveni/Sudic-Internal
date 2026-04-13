@@ -6,17 +6,62 @@ import { allTools, isRiskyTool } from '../lib/ai/tools/index.js'
 
 const router = express.Router()
 
+/** Stored in DB (includes secret fields). */
 export type UserPreferences = {
   ai_provider?: 'anthropic' | 'openai' | 'anthropic_with_openai_fallback'
   openai_fallback_enabled?: boolean
   openai_model?: string
   developer_mode?: boolean
+  /** How the user wants to be addressed. */
+  display_name?: string
+  job_title?: string
+  /** Long-term facts / context for the AI. */
+  ai_memory?: string
+  /** Tone, traits, formality, language preferences. */
+  ai_personality?: string
+  /** Extra behavioral rules. */
+  ai_custom_instructions?: string
+  /** ISO timestamp when guided /setup was completed (optional). */
+  setup_completed_at?: string
+  /** Per-user Anthropic key (never returned to the client). */
+  anthropic_api_key?: string
+  /** Per-user OpenAI key (never returned to the client). */
+  openai_api_key?: string
+}
+
+/** Safe to send to the browser. */
+export type UserPreferencesPublic = Omit<UserPreferences, 'anthropic_api_key' | 'openai_api_key'> & {
+  anthropic_api_key_configured?: boolean
+  openai_api_key_configured?: boolean
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {
   ai_provider: 'anthropic',
   openai_fallback_enabled: true,
   openai_model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+}
+
+function redactForClient(merged: UserPreferences): UserPreferencesPublic {
+  const { anthropic_api_key, openai_api_key, ...rest } = merged
+  return {
+    ...rest,
+    anthropic_api_key_configured: Boolean(anthropic_api_key?.trim()),
+    openai_api_key_configured: Boolean(openai_api_key?.trim()),
+  }
+}
+
+/** Full merged preferences including API keys (for AI routes only). */
+export async function getUserPreferencesForAi(userId: string): Promise<UserPreferences> {
+  const supabase = createServiceClient()
+  const { data, error } = await supabase
+    .from('user_preferences')
+    .select('preferences')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (error) throw error
+  const prefs = (data?.preferences as UserPreferences) ?? {}
+  return { ...DEFAULT_PREFERENCES, ...prefs }
 }
 
 // GET /api/user/preferences
@@ -31,7 +76,8 @@ router.get('/preferences', requireAuth, async (req: AuthenticatedRequest, res) =
 
     if (error) throw error
     const prefs = (data?.preferences as UserPreferences) ?? {}
-    res.json({ preferences: { ...DEFAULT_PREFERENCES, ...prefs } })
+    const merged = { ...DEFAULT_PREFERENCES, ...prefs }
+    res.json({ preferences: redactForClient(merged) })
   } catch (err: unknown) {
     console.error('Get preferences error:', err)
     res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to load preferences' })
@@ -41,8 +87,16 @@ router.get('/preferences', requireAuth, async (req: AuthenticatedRequest, res) =
 // PATCH /api/user/preferences
 router.patch('/preferences', requireAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const body = req.body as Partial<UserPreferences>
-    const allowed: (keyof UserPreferences)[] = ['ai_provider', 'openai_fallback_enabled', 'openai_model', 'developer_mode']
+    const body = req.body as Partial<UserPreferences> & {
+      anthropic_api_key?: string | null
+      openai_api_key?: string | null
+    }
+    const allowed: (keyof UserPreferences)[] = [
+      'ai_provider',
+      'openai_fallback_enabled',
+      'openai_model',
+      'developer_mode',
+    ]
     const updates: UserPreferences = {}
     for (const key of allowed) {
       if (body[key] !== undefined) {
@@ -62,7 +116,45 @@ router.patch('/preferences', requireAuth, async (req: AuthenticatedRequest, res)
       .maybeSingle()
 
     const current = (existing?.preferences as UserPreferences) ?? {}
-    const merged = { ...DEFAULT_PREFERENCES, ...current, ...updates }
+    let merged: UserPreferences = { ...DEFAULT_PREFERENCES, ...current, ...updates }
+
+    const profileStringKeys = [
+      'display_name',
+      'job_title',
+      'ai_memory',
+      'ai_personality',
+      'ai_custom_instructions',
+    ] as const
+    for (const key of profileStringKeys) {
+      if (body[key] !== undefined) {
+        const v = String(body[key] ?? '').trim()
+        if (v) merged[key] = v
+        else delete merged[key]
+      }
+    }
+    if (body.setup_completed_at !== undefined) {
+      const v = String(body.setup_completed_at ?? '').trim()
+      if (v) merged.setup_completed_at = v
+      else delete merged.setup_completed_at
+    }
+
+    if (body.anthropic_api_key !== undefined) {
+      const v = body.anthropic_api_key
+      if (v === null || String(v).trim() === '') {
+        delete merged.anthropic_api_key
+      } else {
+        merged.anthropic_api_key = String(v).trim()
+      }
+    }
+
+    if (body.openai_api_key !== undefined) {
+      const v = body.openai_api_key
+      if (v === null || String(v).trim() === '') {
+        delete merged.openai_api_key
+      } else {
+        merged.openai_api_key = String(v).trim()
+      }
+    }
 
     const { data, error } = await supabase
       .from('user_preferences')
@@ -74,7 +166,8 @@ router.patch('/preferences', requireAuth, async (req: AuthenticatedRequest, res)
       .single()
 
     if (error) throw error
-    res.json({ preferences: (data?.preferences as UserPreferences) ?? merged })
+    const saved = (data?.preferences as UserPreferences) ?? merged
+    res.json({ preferences: redactForClient({ ...DEFAULT_PREFERENCES, ...saved }) })
   } catch (err: unknown) {
     console.error('Update preferences error:', err)
     res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to save preferences' })

@@ -2,15 +2,59 @@ import express from 'express'
 import Anthropic from '@anthropic-ai/sdk'
 import { randomUUID } from 'node:crypto'
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth.js'
-import { createServiceClient } from '../lib/supabase.js'
 import { getClaudeClient, CLAUDE_MODEL, MAX_TOKENS } from '../lib/ai/claude.js'
-import { getSystemPrompt } from '../lib/ai/system-prompt.js'
+import { getSystemPrompt, composeSystemPrompt, type UserPromptAugmentation } from '../lib/ai/system-prompt.js'
 import { allTools, isRiskyTool, getRiskyToolDescription, executeTool, ToolContext } from '../lib/ai/tools/index.js'
 import { runOpenAIAgentLoop, isOpenAIAvailable } from '../lib/ai/openai.js'
 import type { PendingApproval } from '../lib/ai/types.js'
-import type { UserPreferences } from './user.js'
+import { getUserPreferencesForAi, type UserPreferences } from './user.js'
 
 const router = express.Router()
+
+function prefsToAugmentation(prefs: UserPreferences): UserPromptAugmentation {
+  return {
+    display_name: prefs.display_name,
+    job_title: prefs.job_title,
+    ai_memory: prefs.ai_memory,
+    ai_personality: prefs.ai_personality,
+    ai_custom_instructions: prefs.ai_custom_instructions,
+  }
+}
+
+function getLastUserMessageText(messages: Anthropic.MessageParam[]): string | null {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i]
+    if (m.role !== 'user') continue
+    const c = m.content
+    if (typeof c === 'string') return c
+    if (Array.isArray(c)) {
+      let out = ''
+      for (const b of c as Array<{ type?: string; text?: string }>) {
+        if (b.type === 'text' && b.text) out += b.text
+      }
+      return out || null
+    }
+  }
+  return null
+}
+
+function isSetupCommand(text: string | null): boolean {
+  if (!text) return false
+  const t = text.trim()
+  return t === '/setup' || t.startsWith('/setup ')
+}
+
+function buildSystemPromptForRequest(fullPrefs: UserPreferences, messages: Anthropic.MessageParam[]): string {
+  const setupMode = isSetupCommand(getLastUserMessageText(messages))
+  const aug = prefsToAugmentation(fullPrefs)
+  const hasAug =
+    Boolean(aug.display_name?.trim()) ||
+    Boolean(aug.job_title?.trim()) ||
+    Boolean(aug.ai_memory?.trim()) ||
+    Boolean(aug.ai_personality?.trim()) ||
+    Boolean(aug.ai_custom_instructions?.trim())
+  return composeSystemPrompt(getSystemPrompt(), hasAug ? aug : undefined, { setupMode })
+}
 
 // ─── Pending approval store ───────────────────────────────────────────────────
 
@@ -144,8 +188,9 @@ async function runAgentLoop(
   res: express.Response,
   messages: Anthropic.MessageParam[],
   ctx: ToolContext,
+  options: { anthropicKey?: string | null; systemPrompt: string },
 ) {
-  const client = getClaudeClient()
+  const client = getClaudeClient(options.anthropicKey)
 
   while (true) {
     // Stream Claude's response — retry on overload/rate-limit so we "always have Claude"
@@ -156,7 +201,7 @@ async function runAgentLoop(
         stream = await client.messages.stream({
           model: CLAUDE_MODEL,
           max_tokens: MAX_TOKENS,
-          system: getSystemPrompt(),
+          system: options.systemPrompt,
           tools: allTools,
           messages: sanitizeMessages(messages),
         })
@@ -311,21 +356,6 @@ async function runAgentLoop(
   }
 }
 
-async function getUserPreferences(userId: string): Promise<UserPreferences> {
-  const supabase = createServiceClient()
-  const { data } = await supabase
-    .from('user_preferences')
-    .select('preferences')
-    .eq('user_id', userId)
-    .maybeSingle() as { data: { preferences: UserPreferences } | null }
-  const prefs = data?.preferences ?? {}
-  return {
-    ai_provider: prefs.ai_provider ?? 'anthropic',
-    openai_fallback_enabled: prefs.openai_fallback_enabled ?? true,
-    openai_model: prefs.openai_model,
-  }
-}
-
 // ─── POST /api/ai/chat ────────────────────────────────────────────────────────
 
 router.post('/chat', requireAuth, async (req: AuthenticatedRequest, res) => {
@@ -345,21 +375,35 @@ router.post('/chat', requireAuth, async (req: AuthenticatedRequest, res) => {
     userId: req.user!.id,
   }
 
-  const prefs = await getUserPreferences(req.user!.id)
-  const useOpenAIFallback = (prefs.ai_provider === 'anthropic_with_openai_fallback' || prefs.openai_fallback_enabled) && isOpenAIAvailable()
-  const primaryOpenAI = prefs.ai_provider === 'openai'
+  const fullPrefs = await getUserPreferencesForAi(req.user!.id)
+  const userAnthropic = fullPrefs.anthropic_api_key?.trim() || undefined
+  const userOpenai = fullPrefs.openai_api_key?.trim() || undefined
+  const systemPrompt = buildSystemPromptForRequest(fullPrefs, messages)
+
+  const useOpenAIFallback =
+    (fullPrefs.ai_provider === 'anthropic_with_openai_fallback' || fullPrefs.openai_fallback_enabled) &&
+    isOpenAIAvailable(userOpenai)
+  const primaryOpenAI = fullPrefs.ai_provider === 'openai'
 
   const keepAlive = startKeepAlive(res)
   try {
-    if (primaryOpenAI && isOpenAIAvailable()) {
-      await runOpenAIAgentLoop(res, [...messages], ctx, sendEvent, pendingApprovals, randomUUID, { model: prefs.openai_model })
+    if (primaryOpenAI && isOpenAIAvailable(userOpenai)) {
+      await runOpenAIAgentLoop(res, [...messages], ctx, sendEvent, pendingApprovals, randomUUID, {
+        model: fullPrefs.openai_model,
+        apiKey: userOpenai,
+        systemPrompt,
+      })
     } else {
-      await runAgentLoop(res, [...messages], ctx)
+      await runAgentLoop(res, [...messages], ctx, { anthropicKey: userAnthropic, systemPrompt })
     }
   } catch (err: unknown) {
-    if (useOpenAIFallback && !primaryOpenAI && isOpenAIAvailable() && !res.writableEnded) {
+    if (useOpenAIFallback && !primaryOpenAI && isOpenAIAvailable(userOpenai) && !res.writableEnded) {
       try {
-        await runOpenAIAgentLoop(res, [...messages], ctx, sendEvent, pendingApprovals, randomUUID, { model: prefs.openai_model })
+        await runOpenAIAgentLoop(res, [...messages], ctx, sendEvent, pendingApprovals, randomUUID, {
+          model: fullPrefs.openai_model,
+          apiKey: userOpenai,
+          systemPrompt,
+        })
         return
       } catch (fallbackErr) {
         console.error('OpenAI fallback error:', fallbackErr)
@@ -452,7 +496,10 @@ router.post('/approve', requireAuth, async (req: AuthenticatedRequest, res) => {
     ]
 
     const messages = [...pending.messages, { role: 'user' as const, content: fullToolResults }]
-    await runAgentLoop(res, messages, ctx)
+    const fullPrefs = await getUserPreferencesForAi(pending.userId)
+    const userAnthropic = fullPrefs.anthropic_api_key?.trim() || undefined
+    const systemPrompt = buildSystemPromptForRequest(fullPrefs, messages)
+    await runAgentLoop(res, messages, ctx, { anthropicKey: userAnthropic, systemPrompt })
   } catch (err: unknown) {
     console.error('Approve error:', err)
     const message = formatClaudeErrorMessage(err)
@@ -524,7 +571,10 @@ router.post('/reject', requireAuth, async (req: AuthenticatedRequest, res) => {
     ]
 
     const messages = [...pending.messages, { role: 'user' as const, content: fullToolResults }]
-    await runAgentLoop(res, messages, ctx)
+    const fullPrefs = await getUserPreferencesForAi(pending.userId)
+    const userAnthropic = fullPrefs.anthropic_api_key?.trim() || undefined
+    const systemPrompt = buildSystemPromptForRequest(fullPrefs, messages)
+    await runAgentLoop(res, messages, ctx, { anthropicKey: userAnthropic, systemPrompt })
   } catch (err: unknown) {
     console.error('Reject error:', err)
     const message = formatClaudeErrorMessage(err)

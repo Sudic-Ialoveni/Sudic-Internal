@@ -203,3 +203,60 @@ Set "donut": false for a full pie chart.
 
 Today is ${today}.`
 }
+
+/** Fields merged into the system prompt from user preferences (see user_preferences JSON). */
+export type UserPromptAugmentation = {
+  display_name?: string
+  job_title?: string
+  ai_memory?: string
+  ai_personality?: string
+  ai_custom_instructions?: string
+}
+
+const SETUP_MODE_APPENDIX = `
+
+## Guided setup mode (/setup)
+
+The user started **setup** with \`/setup\`. Your job is to onboard them conversationally:
+
+1. **Greet briefly** and explain you will personalize Tariti for them (no more than 2–3 short paragraphs total across the flow).
+2. **Ask a few things, one or two at a time**: how they want to be addressed (name), their role/title, preferred language or tone, any facts they want you to **remember long-term** (projects, habits, constraints), and how they want you to behave (personality traits: e.g. concise vs detailed, formal vs casual).
+3. When they confirm details, **call \`update_user_preferences\`** to save \`display_name\`, \`job_title\`, \`ai_memory\`, \`ai_personality\`, \`ai_custom_instructions\` as appropriate. Use \`append_to_ai_memory\` to add notes without wiping prior memory. When the flow feels complete, call with \`mark_setup_complete: true\`.
+4. Remind them they can change everything anytime under **Settings**.
+
+Stay friendly, efficient, and respect internal/company context (Sudic, Moldova, real estate).`
+
+/**
+ * Full system prompt: base Sudic/Tariti instructions plus optional user-specific block and optional /setup mode.
+ */
+export function composeSystemPrompt(
+  base: string,
+  aug: UserPromptAugmentation | null | undefined,
+  options: { setupMode?: boolean } = {},
+): string {
+  const parts: string[] = [base]
+
+  if (aug && (aug.display_name?.trim() || aug.job_title?.trim() || aug.ai_memory?.trim() || aug.ai_personality?.trim() || aug.ai_custom_instructions?.trim())) {
+    const lines: string[] = []
+    if (aug.display_name?.trim()) lines.push(`- **Name / how to address them**: ${aug.display_name.trim()}`)
+    if (aug.job_title?.trim()) lines.push(`- **Role / title**: ${aug.job_title.trim()}`)
+    if (lines.length) parts.push(`\n## User profile\n${lines.join('\n')}`)
+    if (aug.ai_memory?.trim()) {
+      parts.push(
+        `\n## Long-term memory (user-provided)\nTreat as factual about this user unless they correct you:\n\n${aug.ai_memory.trim()}`,
+      )
+    }
+    if (aug.ai_personality?.trim()) {
+      parts.push(`\n## Personality & tone\nAdapt your style accordingly:\n\n${aug.ai_personality.trim()}`)
+    }
+    if (aug.ai_custom_instructions?.trim()) {
+      parts.push(`\n## Additional instructions\n${aug.ai_custom_instructions.trim()}`)
+    }
+  }
+
+  if (options.setupMode) {
+    parts.push(SETUP_MODE_APPENDIX)
+  }
+
+  return parts.join('')
+}

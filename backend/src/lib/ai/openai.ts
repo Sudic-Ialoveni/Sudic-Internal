@@ -9,19 +9,28 @@ import type { PendingApproval } from './types.js'
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini'
 const MAX_TOKENS = 4096
 
-let _client: OpenAI | null = null
+const clients = new Map<string, OpenAI>()
 
-export function getOpenAIClient(): OpenAI {
-  if (!_client) {
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!apiKey) throw new Error('OPENAI_API_KEY is not set')
-    _client = new OpenAI({ apiKey })
+/**
+ * @param userApiKey - optional per-user key from Settings; if omitted, uses OPENAI_API_KEY from env.
+ */
+export function getOpenAIClient(userApiKey?: string | null): OpenAI {
+  const apiKey = (userApiKey?.trim() || process.env.OPENAI_API_KEY || '').trim()
+  if (!apiKey) {
+    throw new Error(
+      'No OpenAI API key. Add your key in Settings → AI, or set OPENAI_API_KEY on the server.',
+    )
   }
-  return _client
+  let c = clients.get(apiKey)
+  if (!c) {
+    c = new OpenAI({ apiKey })
+    clients.set(apiKey, c)
+  }
+  return c
 }
 
-export function isOpenAIAvailable(): boolean {
-  return Boolean(process.env.OPENAI_API_KEY)
+export function isOpenAIAvailable(userApiKey?: string | null): boolean {
+  return Boolean((userApiKey?.trim() || process.env.OPENAI_API_KEY || '').trim())
 }
 
 // Convert Anthropic tool schema to OpenAI function format
@@ -116,7 +125,7 @@ function openAIAssistantToAnthropicContent(
 
 export type ExpressResponse = import('express').Response
 
-export type OpenAIAgentOptions = { model?: string }
+export type OpenAIAgentOptions = { model?: string; apiKey?: string | null; systemPrompt?: string }
 
 export async function runOpenAIAgentLoop(
   res: ExpressResponse,
@@ -127,8 +136,8 @@ export async function runOpenAIAgentLoop(
   randomUUID: () => string,
   options: OpenAIAgentOptions = {},
 ): Promise<void> {
-  const client = getOpenAIClient()
-  const systemPrompt = getSystemPrompt()
+  const client = getOpenAIClient(options.apiKey)
+  const systemPrompt = options.systemPrompt ?? getSystemPrompt()
   const tools = getOpenAITools()
   const model = options.model?.trim() || DEFAULT_OPENAI_MODEL
 

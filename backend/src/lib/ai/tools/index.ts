@@ -5,6 +5,7 @@ import { analyticsTools, handleGetAmocrmAnalytics, handleGetMoizvonkiAnalytics, 
 import { externalValueTools, handleGetExternalValue } from './external-value.js'
 import { webSearchTools, handleWebSearch } from './web-search.js'
 import { codeExecTools, handleRunCode } from './code-exec.js'
+import { userPreferencesTools, handleUpdateUserPreferences } from './user-preferences.js'
 
 export interface ToolContext {
   authToken: string
@@ -25,6 +26,7 @@ export const allTools: Anthropic.Tool[] = [
   ...externalValueTools,
   ...webSearchTools,
   ...codeExecTools,
+  ...userPreferencesTools,
 ]
 
 // Tools that require human approval before execution
@@ -93,6 +95,8 @@ export async function executeTool(
       return handleWebSearch(toolInput as Parameters<typeof handleWebSearch>[0], ctx)
     case 'run_code':
       return handleRunCode(toolInput as Parameters<typeof handleRunCode>[0], ctx)
+    case 'update_user_preferences':
+      return handleUpdateUserPreferences(toolInput, ctx)
     default:
       return { success: false, error: `Unknown tool: ${toolName}` }
   }
