@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useDeveloper } from '@/contexts/DeveloperContext'
+import { OnboardingProvider } from '@/contexts/OnboardingContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { apiFetch, getToken } from '@/lib/api'
+import AppOnboardingTour from '@/components/onboarding/AppOnboardingTour'
 
 type NavItem = {
   label: string
@@ -86,6 +88,15 @@ const devNavItems: DevNavItem[] = [
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <OnboardingProvider>
+      <DashboardLayoutInner>{children}</DashboardLayoutInner>
+      <AppOnboardingTour />
+    </OnboardingProvider>
+  )
+}
+
+function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null)
   const [customPages, setCustomPages] = useState<CustomPage[]>([])
   const [pagesLoading, setPagesLoading] = useState(true)
@@ -226,6 +237,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={item.path}
                 to={item.path}
+                data-tour={
+                  item.path === '/'
+                    ? 'nav-overview'
+                    : item.path === '/tariti-gpt'
+                      ? 'nav-tariti'
+                      : item.path === '/settings'
+                        ? 'nav-settings'
+                        : undefined
+                }
                 aria-current={isActive(item.path) ? 'page' : undefined}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   isActive(item.path)

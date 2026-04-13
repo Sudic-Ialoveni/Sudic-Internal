@@ -641,7 +641,7 @@ export default function TaritiGPTPage({ shared = false }: { shared?: boolean }) 
       )}
 
       {/* ── Main chat area ──────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden" data-tour="tariti-main">
 
         {/* Top bar */}
         <div className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 border-b border-slate-800/60">

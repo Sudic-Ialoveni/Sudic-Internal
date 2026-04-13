@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useDeveloper } from '@/contexts/DeveloperContext'
+import { useOnboarding } from '@/contexts/OnboardingContext'
 import { apiFetch, apiPatch, apiPost } from '@/lib/api'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { supabase } from '@/lib/supabase/client'
@@ -18,6 +19,7 @@ export type UserPreferences = {
   ai_personality?: string
   ai_custom_instructions?: string
   setup_completed_at?: string
+  app_onboarding_completed?: boolean
 }
 
 const DEFAULT_PREFS: UserPreferences = {
@@ -63,6 +65,7 @@ export default function SettingsPage() {
   const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   const developer = useDeveloper()
+  const onboarding = useOnboarding()
 
   useEffect(() => {
     fetchPrefs()
@@ -260,7 +263,7 @@ export default function SettingsPage() {
             <>
               <h1 className="text-2xl font-semibold text-white">Profile</h1>
               <p className="text-sm text-slate-400 mt-1">How you appear to Tariti and in the app.</p>
-              <div className="mt-8 space-y-5 rounded-xl border border-slate-700/60 bg-slate-800/40 p-6">
+              <div className="mt-8 space-y-5 rounded-xl border border-slate-700/60 bg-slate-800/40 p-6" data-tour="settings-profile-panel">
                 <div>
                   <label className="block text-xs font-medium text-slate-500 mb-2">Display name</label>
                   <input
@@ -345,7 +348,7 @@ export default function SettingsPage() {
                 Tariti reads this on every reply. You can also run <code className="text-indigo-300">/setup</code> in chat
                 for a guided walkthrough.
               </p>
-              <div className="mt-8 space-y-5 rounded-xl border border-slate-700/60 bg-slate-800/40 p-6">
+              <div className="mt-8 space-y-5 rounded-xl border border-slate-700/60 bg-slate-800/40 p-6" data-tour="settings-ai-panel">
                 <div>
                   <label className="block text-xs font-medium text-slate-500 mb-2">Long-term memory</label>
                   <textarea
@@ -386,7 +389,7 @@ export default function SettingsPage() {
               <p className="text-sm text-slate-400 mt-1">
                 Optional personal keys override server defaults. Keys are stored server-side only.
               </p>
-              <div className="mt-8 space-y-6">
+              <div className="mt-8 space-y-6" data-tour="settings-keys-panel">
                 <div className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-6 space-y-6">
                   {/* Anthropic */}
                   <div>
@@ -646,6 +649,22 @@ export default function SettingsPage() {
                 <p className="text-xs text-slate-500 mt-2">
                   Enables dev logs in the browser console and the Development section in the sidebar.
                 </p>
+                <div className="mt-8 pt-6 border-t border-slate-700/60" data-tour="settings-reset-onboarding">
+                  <h2 className="text-sm font-semibold text-slate-200 mb-1">Setup tour</h2>
+                  <p className="text-xs text-slate-500 mb-3">
+                    Run the interactive onboarding again (spotlight tour). You will be taken home and the tour restarts;
+                    refresh also works while the tour is incomplete.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void onboarding.resetTour()
+                    }}
+                    className="px-4 py-2 rounded-lg border border-amber-500/30 bg-amber-500/10 text-sm text-amber-200 hover:bg-amber-500/20 transition-colors"
+                  >
+                    Reset setup tour
+                  </button>
+                </div>
               </div>
             </>
           )}

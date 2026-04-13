@@ -24,6 +24,8 @@ export type UserPreferences = {
   ai_custom_instructions?: string
   /** ISO timestamp when guided /setup was completed (optional). */
   setup_completed_at?: string
+  /** Product tour / first-run UI onboarding finished (server default false; existing rows backfilled via migration). */
+  app_onboarding_completed?: boolean
   /** Per-user Anthropic key (never returned to the client). */
   anthropic_api_key?: string
   /** Per-user OpenAI key (never returned to the client). */
@@ -40,6 +42,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   ai_provider: 'anthropic',
   openai_fallback_enabled: true,
   openai_model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+  app_onboarding_completed: false,
 }
 
 function redactForClient(merged: UserPreferences): UserPreferencesPublic {
@@ -137,6 +140,9 @@ router.patch('/preferences', requireAuth, async (req: AuthenticatedRequest, res)
       const v = String(body.setup_completed_at ?? '').trim()
       if (v) merged.setup_completed_at = v
       else delete merged.setup_completed_at
+    }
+    if (body.app_onboarding_completed !== undefined) {
+      merged.app_onboarding_completed = Boolean(body.app_onboarding_completed)
     }
 
     if (body.anthropic_api_key !== undefined) {
