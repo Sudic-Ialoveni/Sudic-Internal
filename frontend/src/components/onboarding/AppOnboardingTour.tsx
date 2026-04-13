@@ -3,6 +3,42 @@ import Joyride, { ACTIONS, EVENTS, STATUS, type CallBackProps, type Step } from 
 import { useNavigate } from 'react-router-dom'
 import { useOnboarding } from '@/contexts/OnboardingContext'
 
+/** Real button — Joyride's last-step primary often emits CLOSE, not NEXT, so callbacks miss completion. */
+function TourFinishPanel() {
+  const { completeTour } = useOnboarding()
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  return (
+    <div className="space-y-3 text-sm leading-relaxed">
+      <p>
+        Set how you appear in the app. When you are done, save completion below. You can run the tour again from{' '}
+        <strong className="text-white">Settings → Developer</strong>.
+      </p>
+      {error && <p className="text-xs text-rose-400">{error}</p>}
+      <button
+        type="button"
+        disabled={busy}
+        className="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+        onClick={async () => {
+          setError(null)
+          setBusy(true)
+          try {
+            await completeTour()
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : 'Could not save. Try again.'
+            setError(msg)
+          } finally {
+            setBusy(false)
+          }
+        }}
+      >
+        {busy ? 'Saving…' : 'Finish setup'}
+      </button>
+    </div>
+  )
+}
+
 const joyrideStyles = {
   options: {
     zIndex: 10050,
@@ -124,17 +160,10 @@ export default function AppOnboardingTour() {
       {
         target: '[data-tour="settings-profile-panel"]',
         title: 'Profile',
-        content: (
-          <div className="space-y-2 text-sm leading-relaxed">
-            <p>
-              Set how you appear in the app. Press <strong className="text-white">Finish setup</strong> on this step to
-              complete the tour. You can run it again from <strong className="text-white">Settings → Developer</strong>{' '}
-              (reset).
-            </p>
-          </div>
-        ),
+        content: <TourFinishPanel />,
         disableBeacon: true,
         placement: 'bottom',
+        hideFooter: true,
       },
     ],
     [],
@@ -149,7 +178,10 @@ export default function AppOnboardingTour() {
       const markComplete = () => {
         if (finishOnce.current) return
         finishOnce.current = true
-        void completeTour()
+        void completeTour().catch((err) => {
+          finishOnce.current = false
+          console.error('Onboarding completion failed:', err)
+        })
       }
 
       if (status === STATUS.SKIPPED) {

@@ -142,7 +142,8 @@ router.patch('/preferences', requireAuth, async (req: AuthenticatedRequest, res)
       else delete merged.setup_completed_at
     }
     if (body.app_onboarding_completed !== undefined) {
-      merged.app_onboarding_completed = Boolean(body.app_onboarding_completed)
+      // Strict boolean only — Boolean("false") is true in JS; JSON sends real booleans from our client.
+      merged.app_onboarding_completed = body.app_onboarding_completed === true
     }
 
     if (body.anthropic_api_key !== undefined) {
