@@ -2,6 +2,7 @@ import express from 'express'
 import { createServiceClient } from '../lib/supabase.js'
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth.js'
 import { getSystemPrompt } from '../lib/ai/system-prompt.js'
+import { testAnthropicApiKey, testOpenAIApiKey } from '../lib/ai/validate-keys.js'
 import { allTools, isRiskyTool } from '../lib/ai/tools/index.js'
 
 const router = express.Router()
@@ -171,6 +172,46 @@ router.patch('/preferences', requireAuth, async (req: AuthenticatedRequest, res)
   } catch (err: unknown) {
     console.error('Update preferences error:', err)
     res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to save preferences' })
+  }
+})
+
+// POST /api/user/test-anthropic-key — body: { api_key?: string } (omit to test saved key)
+router.post('/test-anthropic-key', requireAuth, async (req: AuthenticatedRequest, res) => {
+  try {
+    const raw = typeof req.body?.api_key === 'string' ? req.body.api_key.trim() : ''
+    let key = raw
+    if (!key) {
+      const prefs = await getUserPreferencesForAi(req.user!.id)
+      key = prefs.anthropic_api_key?.trim() ?? ''
+    }
+    if (!key) {
+      return res.json({ ok: false, error: 'No API key to test. Paste a key or save one first.' })
+    }
+    const result = await testAnthropicApiKey(key)
+    return res.json(result.ok ? { ok: true } : { ok: false, error: result.error ?? 'Validation failed' })
+  } catch (err: unknown) {
+    console.error('test-anthropic-key:', err)
+    res.status(500).json({ ok: false, error: err instanceof Error ? err.message : 'Test failed' })
+  }
+})
+
+// POST /api/user/test-openai-key — body: { api_key?: string } (omit to test saved key)
+router.post('/test-openai-key', requireAuth, async (req: AuthenticatedRequest, res) => {
+  try {
+    const raw = typeof req.body?.api_key === 'string' ? req.body.api_key.trim() : ''
+    let key = raw
+    if (!key) {
+      const prefs = await getUserPreferencesForAi(req.user!.id)
+      key = prefs.openai_api_key?.trim() ?? ''
+    }
+    if (!key) {
+      return res.json({ ok: false, error: 'No API key to test. Paste a key or save one first.' })
+    }
+    const result = await testOpenAIApiKey(key)
+    return res.json(result.ok ? { ok: true } : { ok: false, error: result.error ?? 'Validation failed' })
+  } catch (err: unknown) {
+    console.error('test-openai-key:', err)
+    res.status(500).json({ ok: false, error: err instanceof Error ? err.message : 'Test failed' })
   }
 })
 

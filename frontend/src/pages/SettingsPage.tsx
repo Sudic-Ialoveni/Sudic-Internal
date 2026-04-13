@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useDeveloper } from '@/contexts/DeveloperContext'
-import { apiFetch, apiPatch } from '@/lib/api'
+import { apiFetch, apiPatch, apiPost } from '@/lib/api'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { supabase } from '@/lib/supabase/client'
 
@@ -47,8 +47,12 @@ export default function SettingsPage() {
   const [prefs, setPrefs] = useState<UserPreferences>(DEFAULT_PREFS)
   const [anthropicKeyInput, setAnthropicKeyInput] = useState('')
   const [openaiKeyInput, setOpenaiKeyInput] = useState('')
-  const [clearAnthropicKey, setClearAnthropicKey] = useState(false)
-  const [clearOpenaiKey, setClearOpenaiKey] = useState(false)
+  const [editingAnthropic, setEditingAnthropic] = useState(false)
+  const [editingOpenai, setEditingOpenai] = useState(false)
+  const [testingAnthropic, setTestingAnthropic] = useState(false)
+  const [testingOpenai, setTestingOpenai] = useState(false)
+  const [anthropicKeyFeedback, setAnthropicKeyFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [openaiKeyFeedback, setOpenaiKeyFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -72,8 +76,10 @@ export default function SettingsPage() {
       setPrefs(merged)
       setAnthropicKeyInput('')
       setOpenaiKeyInput('')
-      setClearAnthropicKey(false)
-      setClearOpenaiKey(false)
+      setEditingAnthropic(false)
+      setEditingOpenai(false)
+      setAnthropicKeyFeedback(null)
+      setOpenaiKeyFeedback(null)
       developer?.setDeveloperMode(!!merged.developer_mode)
     } catch {
       setPrefs(DEFAULT_PREFS)
@@ -103,24 +109,21 @@ export default function SettingsPage() {
         ai_custom_instructions: prefs.ai_custom_instructions,
       }
 
-      if (clearAnthropicKey) {
-        body.anthropic_api_key = ''
-      } else if (anthropicKeyInput.trim()) {
-        body.anthropic_api_key = anthropicKeyInput.trim()
-      }
-
-      if (clearOpenaiKey) {
-        body.openai_api_key = ''
-      } else if (openaiKeyInput.trim()) {
-        body.openai_api_key = openaiKeyInput.trim()
-      }
+      const anthTrim = anthropicKeyInput.trim()
+      const openTrim = openaiKeyInput.trim()
+      if (anthTrim) body.anthropic_api_key = anthTrim
+      if (openTrim) body.openai_api_key = openTrim
 
       const data = await apiPatch<{ preferences: UserPreferences }>('/api/user/preferences', body)
       setPrefs((p) => ({ ...p, ...data.preferences }))
-      setAnthropicKeyInput('')
-      setOpenaiKeyInput('')
-      setClearAnthropicKey(false)
-      setClearOpenaiKey(false)
+      if (anthTrim) {
+        setAnthropicKeyInput('')
+        setEditingAnthropic(false)
+      }
+      if (openTrim) {
+        setOpenaiKeyInput('')
+        setEditingOpenai(false)
+      }
       developer?.setDeveloperMode(!!data.preferences?.developer_mode)
       setMessage({ type: 'success', text: 'Settings saved.' })
     } catch {
@@ -152,6 +155,66 @@ export default function SettingsPage() {
       setPasswordMessage({ type: 'error', text: msg })
     } finally {
       setPasswordSaving(false)
+    }
+  }
+
+  async function removeAnthropicKey() {
+    setAnthropicKeyFeedback(null)
+    try {
+      const data = await apiPatch<{ preferences: UserPreferences }>('/api/user/preferences', { anthropic_api_key: '' })
+      setPrefs((p) => ({ ...p, ...data.preferences }))
+      setAnthropicKeyInput('')
+      setEditingAnthropic(false)
+      setAnthropicKeyFeedback({ type: 'success', text: 'Anthropic key removed.' })
+    } catch {
+      setAnthropicKeyFeedback({ type: 'error', text: 'Could not remove key.' })
+    }
+  }
+
+  async function removeOpenaiKey() {
+    setOpenaiKeyFeedback(null)
+    try {
+      const data = await apiPatch<{ preferences: UserPreferences }>('/api/user/preferences', { openai_api_key: '' })
+      setPrefs((p) => ({ ...p, ...data.preferences }))
+      setOpenaiKeyInput('')
+      setEditingOpenai(false)
+      setOpenaiKeyFeedback({ type: 'success', text: 'OpenAI key removed.' })
+    } catch {
+      setOpenaiKeyFeedback({ type: 'error', text: 'Could not remove key.' })
+    }
+  }
+
+  async function testAnthropicKey() {
+    setAnthropicKeyFeedback(null)
+    setTestingAnthropic(true)
+    try {
+      const payload: { api_key?: string } = {}
+      const t = anthropicKeyInput.trim()
+      if (t) payload.api_key = t
+      const r = await apiPost<{ ok: boolean; error?: string }>('/api/user/test-anthropic-key', payload)
+      if (r.ok) setAnthropicKeyFeedback({ type: 'success', text: 'Anthropic key is valid.' })
+      else setAnthropicKeyFeedback({ type: 'error', text: r.error ?? 'Key check failed.' })
+    } catch {
+      setAnthropicKeyFeedback({ type: 'error', text: 'Could not reach server.' })
+    } finally {
+      setTestingAnthropic(false)
+    }
+  }
+
+  async function testOpenaiKey() {
+    setOpenaiKeyFeedback(null)
+    setTestingOpenai(true)
+    try {
+      const payload: { api_key?: string } = {}
+      const t = openaiKeyInput.trim()
+      if (t) payload.api_key = t
+      const r = await apiPost<{ ok: boolean; error?: string }>('/api/user/test-openai-key', payload)
+      if (r.ok) setOpenaiKeyFeedback({ type: 'success', text: 'OpenAI key is valid.' })
+      else setOpenaiKeyFeedback({ type: 'error', text: r.error ?? 'Key check failed.' })
+    } catch {
+      setOpenaiKeyFeedback({ type: 'error', text: 'Could not reach server.' })
+    } finally {
+      setTestingOpenai(false)
     }
   }
 
@@ -324,69 +387,199 @@ export default function SettingsPage() {
                 Optional personal keys override server defaults. Keys are stored server-side only.
               </p>
               <div className="mt-8 space-y-6">
-                <div className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-6 space-y-5">
+                <div className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-6 space-y-6">
+                  {/* Anthropic */}
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <label className="block text-xs font-medium text-slate-500">Anthropic (Claude)</label>
-                      {prefs.anthropic_api_key_configured && !clearAnthropicKey && (
+                      {prefs.anthropic_api_key_configured && !editingAnthropic && (
                         <span className="text-[10px] uppercase tracking-wide text-emerald-400/90">Saved</span>
                       )}
                     </div>
-                    <input
-                      type="password"
-                      autoComplete="off"
-                      value={clearAnthropicKey ? '' : anthropicKeyInput}
-                      onChange={(e) => {
-                        setClearAnthropicKey(false)
-                        setAnthropicKeyInput(e.target.value)
-                      }}
-                      disabled={clearAnthropicKey}
-                      placeholder={prefs.anthropic_api_key_configured ? 'New key to replace' : 'sk-ant-api03-…'}
-                      className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
-                    />
-                    {prefs.anthropic_api_key_configured && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setClearAnthropicKey((c) => !c)
-                          setAnthropicKeyInput('')
-                        }}
-                        className="mt-2 text-xs text-rose-400 hover:text-rose-300"
+                    {prefs.anthropic_api_key_configured && !editingAnthropic ? (
+                      <>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                          <div
+                            className="flex-1 min-w-0 rounded-lg border border-slate-600 bg-slate-900/70 px-3 py-2.5 font-mono text-sm text-slate-400 tracking-[0.35em] select-none"
+                            aria-label="API key hidden"
+                          >
+                            ••••••••••••••••
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={testAnthropicKey}
+                              disabled={testingAnthropic}
+                              className="px-3 py-1.5 rounded-lg border border-slate-600 bg-slate-800 text-sm text-slate-200 hover:bg-slate-700 disabled:opacity-50"
+                            >
+                              {testingAnthropic ? 'Testing…' : 'Test'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingAnthropic(true)
+                                setAnthropicKeyInput('')
+                                setAnthropicKeyFeedback(null)
+                              }}
+                              className="px-3 py-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/10 text-sm text-indigo-200 hover:bg-indigo-500/20"
+                            >
+                              Replace
+                            </button>
+                            <button
+                              type="button"
+                              onClick={removeAnthropicKey}
+                              className="px-3 py-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 text-sm text-rose-300 hover:bg-rose-500/20"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-1.5">
+                          Test uses a minimal Claude request (Haiku) to verify the key.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <input
+                          type="password"
+                          autoComplete="off"
+                          value={anthropicKeyInput}
+                          onChange={(e) => setAnthropicKeyInput(e.target.value)}
+                          placeholder="sk-ant-api03-…"
+                          className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        />
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          <button
+                            type="button"
+                            onClick={testAnthropicKey}
+                            disabled={
+                              testingAnthropic ||
+                              (!anthropicKeyInput.trim() && !prefs.anthropic_api_key_configured)
+                            }
+                            className="px-3 py-1.5 rounded-lg border border-slate-600 bg-slate-800 text-sm text-slate-200 hover:bg-slate-700 disabled:opacity-50"
+                          >
+                            {testingAnthropic ? 'Testing…' : 'Test key'}
+                          </button>
+                          {prefs.anthropic_api_key_configured && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingAnthropic(false)
+                                setAnthropicKeyInput('')
+                                setAnthropicKeyFeedback(null)
+                              }}
+                              className="px-3 py-1.5 rounded-lg text-sm text-slate-400 hover:text-slate-200"
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
+                    {anthropicKeyFeedback && (
+                      <p
+                        className={`text-xs mt-2 ${
+                          anthropicKeyFeedback.type === 'success' ? 'text-emerald-400' : 'text-rose-400'
+                        }`}
                       >
-                        {clearAnthropicKey ? 'Undo remove' : 'Remove saved Anthropic key'}
-                      </button>
+                        {anthropicKeyFeedback.text}
+                      </p>
                     )}
                   </div>
-                  <div>
+
+                  {/* OpenAI */}
+                  <div className="pt-4 border-t border-slate-700/60">
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <label className="block text-xs font-medium text-slate-500">OpenAI</label>
-                      {prefs.openai_api_key_configured && !clearOpenaiKey && (
+                      {prefs.openai_api_key_configured && !editingOpenai && (
                         <span className="text-[10px] uppercase tracking-wide text-emerald-400/90">Saved</span>
                       )}
                     </div>
-                    <input
-                      type="password"
-                      autoComplete="off"
-                      value={clearOpenaiKey ? '' : openaiKeyInput}
-                      onChange={(e) => {
-                        setClearOpenaiKey(false)
-                        setOpenaiKeyInput(e.target.value)
-                      }}
-                      disabled={clearOpenaiKey}
-                      placeholder={prefs.openai_api_key_configured ? 'New key to replace' : 'sk-…'}
-                      className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
-                    />
-                    {prefs.openai_api_key_configured && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setClearOpenaiKey((c) => !c)
-                          setOpenaiKeyInput('')
-                        }}
-                        className="mt-2 text-xs text-rose-400 hover:text-rose-300"
+                    {prefs.openai_api_key_configured && !editingOpenai ? (
+                      <>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                          <div
+                            className="flex-1 min-w-0 rounded-lg border border-slate-600 bg-slate-900/70 px-3 py-2.5 font-mono text-sm text-slate-400 tracking-[0.35em] select-none"
+                            aria-label="API key hidden"
+                          >
+                            ••••••••••••••••
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={testOpenaiKey}
+                              disabled={testingOpenai}
+                              className="px-3 py-1.5 rounded-lg border border-slate-600 bg-slate-800 text-sm text-slate-200 hover:bg-slate-700 disabled:opacity-50"
+                            >
+                              {testingOpenai ? 'Testing…' : 'Test'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingOpenai(true)
+                                setOpenaiKeyInput('')
+                                setOpenaiKeyFeedback(null)
+                              }}
+                              className="px-3 py-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/10 text-sm text-indigo-200 hover:bg-indigo-500/20"
+                            >
+                              Replace
+                            </button>
+                            <button
+                              type="button"
+                              onClick={removeOpenaiKey}
+                              className="px-3 py-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 text-sm text-rose-300 hover:bg-rose-500/20"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-1.5">Test calls the OpenAI models list endpoint.</p>
+                      </>
+                    ) : (
+                      <>
+                        <input
+                          type="password"
+                          autoComplete="off"
+                          value={openaiKeyInput}
+                          onChange={(e) => setOpenaiKeyInput(e.target.value)}
+                          placeholder="sk-…"
+                          className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        />
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          <button
+                            type="button"
+                            onClick={testOpenaiKey}
+                            disabled={
+                              testingOpenai || (!openaiKeyInput.trim() && !prefs.openai_api_key_configured)
+                            }
+                            className="px-3 py-1.5 rounded-lg border border-slate-600 bg-slate-800 text-sm text-slate-200 hover:bg-slate-700 disabled:opacity-50"
+                          >
+                            {testingOpenai ? 'Testing…' : 'Test key'}
+                          </button>
+                          {prefs.openai_api_key_configured && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingOpenai(false)
+                                setOpenaiKeyInput('')
+                                setOpenaiKeyFeedback(null)
+                              }}
+                              className="px-3 py-1.5 rounded-lg text-sm text-slate-400 hover:text-slate-200"
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
+                    {openaiKeyFeedback && (
+                      <p
+                        className={`text-xs mt-2 ${
+                          openaiKeyFeedback.type === 'success' ? 'text-emerald-400' : 'text-rose-400'
+                        }`}
                       >
-                        {clearOpenaiKey ? 'Undo remove' : 'Remove saved OpenAI key'}
-                      </button>
+                        {openaiKeyFeedback.text}
+                      </p>
                     )}
                   </div>
                 </div>
