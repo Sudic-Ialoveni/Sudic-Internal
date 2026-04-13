@@ -435,7 +435,8 @@ export default function SettingsPage() {
                           </div>
                         </div>
                         <p className="text-[11px] text-slate-500 mt-1.5">
-                          Test uses a minimal Claude request (Haiku) to verify the key.
+                          Test sends one token using the same Claude model as Tariti (server{' '}
+                          <code className="text-slate-400">CLAUDE_MODEL</code>).
                         </p>
                       </>
                     ) : (

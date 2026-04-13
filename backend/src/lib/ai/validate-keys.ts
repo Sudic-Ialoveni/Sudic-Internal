@@ -1,16 +1,18 @@
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
+import { CLAUDE_MODEL } from './claude.js'
 
-/** Small, cheap validation call — model must exist on the account. */
-const ANTHROPIC_TEST_MODEL = 'claude-3-5-haiku-20241022'
-
+/**
+ * Minimal messages call to verify the key. Uses the same model as the app (`CLAUDE_MODEL` / default
+ * from claude.ts) so we never reference a retired or unavailable snapshot like an old Haiku ID.
+ */
 export async function testAnthropicApiKey(apiKey: string): Promise<{ ok: boolean; error?: string }> {
   const key = apiKey.trim()
   if (!key) return { ok: false, error: 'No API key provided' }
   try {
     const client = new Anthropic({ apiKey: key })
     await client.messages.create({
-      model: ANTHROPIC_TEST_MODEL,
+      model: CLAUDE_MODEL,
       max_tokens: 1,
       messages: [{ role: 'user', content: 'ping' }],
     })
