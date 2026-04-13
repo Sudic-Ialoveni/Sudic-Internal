@@ -24,6 +24,10 @@ import { createServiceClient } from './lib/supabase.js'
 export function createApp(): express.Express {
   const app = express()
 
+  if (process.env.FLY_APP_NAME) {
+    app.set('trust proxy', 1)
+  }
+
   app.use(helmet({
     contentSecurityPolicy: process.env.NODE_ENV === 'production',
     crossOriginEmbedderPolicy: false,
@@ -99,6 +103,24 @@ export function createApp(): express.Express {
   }
   app.get('/health', healthHandler)
   app.get('/api/health', healthHandler)
+
+  // Liveness for Fly.io (and similar) — always 200; /health may be 503 if Supabase is down.
+  app.get('/live', (_req, res) => {
+    res.status(200).type('text/plain').send('ok')
+  })
+
+  app.get('/', (_req, res) => {
+    res.status(200).json({
+      service: 'sudic-internal-api',
+      hint: 'JSON API only — open your Vercel app URL for the dashboard UI.',
+      health: '/health',
+      live: '/live',
+    })
+  })
+
+  app.get('/favicon.ico', (_req, res) => {
+    res.status(204).end()
+  })
 
   app.use('/api/webhooks', webhookRoutes)
   app.use('/api/leads', leadsRoutes)

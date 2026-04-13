@@ -1,0 +1,56 @@
+# Sudic Internal API on Fly.io
+#
+# Deploy from repo root:  fly deploy ./backend
+# Or: cd backend && fly deploy
+# Do not run "fly deploy" from the repo root without ./backend — Fly won't find this file.
+#
+# First time:
+#   cd backend
+#   fly auth login
+#   fly launch --no-deploy --copy-config   # or: fly apps create <unique-name> && set app below
+#   fly secrets set SUPABASE_URL=... SUPABASE_ANON_KEY=... SUPABASE_SERVICE_ROLE_KEY=... FRONTEND_URL=https://sudic-internal.vercel.app
+#   fly deploy
+# If deploy hangs on "Waiting for depot builder...", use:  fly deploy --depot=false
+#
+# Then set VITE_BACKEND_URL on Vercel to https://<your-app>.fly.dev (Production + Preview if needed).
+#
+# The line below MUST match an app from:  fly apps list
+# If deploy says "app not found", fix this name or create the app:  fly apps create <name>
+
+app = "sudic-internal"
+# otp (Bucharest) is deprecated for new Fly resources — use an active EU region (e.g. fra).
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3001"
+
+[http_service]
+  internal_port = 3001
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 100
+    hard_limit = 150
+
+  [http_service.http_options]
+    idle_timeout = 300
+
+[[http_service.checks]]
+  grace_period = "15s"
+  interval = "30s"
+  method = "GET"
+  timeout = "5s"
+  path = "/live"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "512mb"

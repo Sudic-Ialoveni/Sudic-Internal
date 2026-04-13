@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { apiUrl } from '@/lib/api'
 import { WidgetProps } from './WidgetRegistry'
 
 interface DataPoint {
@@ -35,7 +36,7 @@ export default function AmoCRMAnalytics({ settings }: WidgetProps) {
       const { supabase } = await import('@/lib/supabase/client')
       const { data: { session } } = await supabase.auth.getSession()
 
-      const res = await fetch(`/api/analytics/amo?metric=${metric}&dateRange=${dateRange}`, {
+      const res = await fetch(apiUrl(`/api/analytics/amo?metric=${metric}&dateRange=${dateRange}`), {
         headers: { Authorization: `Bearer ${session?.access_token || ''}` },
       })
       if (!res.ok) throw new Error('fetch failed')

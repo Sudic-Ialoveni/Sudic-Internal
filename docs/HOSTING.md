@@ -87,12 +87,61 @@ So:
 
 ---
 
+## Backend on Fly.io
+
+The repo includes `backend/fly.toml` (Dockerfile-based deploy, port **3001**, health check on **`/live`**).
+
+1. Install the CLI: [Fly.io install](https://fly.io/docs/hands-on/install-flyctl/).
+2. From **`backend/`**:
+   ```bash
+   fly auth login
+   ```
+3. Create the app if the name in `fly.toml` is taken: change `app = "..."` to a **globally unique** name, then:
+   ```bash
+   fly apps create <your-app-name>
+   ```
+   Or run `fly launch --no-deploy` once and merge any prompts with the existing `fly.toml`.
+4. Set secrets (same values as `backend/.env`; **no** `PORT` or `NODE_ENV` needed in secrets if you keep them in `fly.toml`):
+   ```bash
+   fly secrets set \
+     SUPABASE_URL="https://xxx.supabase.co" \
+     SUPABASE_ANON_KEY="..." \
+     SUPABASE_SERVICE_ROLE_KEY="..." \
+     FRONTEND_URL="https://sudic-internal.vercel.app"
+   ```
+   Add optional keys the same way: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, AmoCRM/Moizvonki, webhook secrets, etc.
+5. Deploy (pick one — Fly must use **`backend/fly.toml`**, so do **not** run plain `fly deploy` from the repo root):
+   ```bash
+   cd backend
+   fly deploy
+   ```
+   From the **repository root**:
+   ```bash
+   fly deploy ./backend
+   ```
+   If your Fly app name differs from `app` in `backend/fly.toml`, either edit `app = "..."` in that file or pass `-a your-app-name`.
+6. **Vercel**: set **`VITE_BACKEND_URL`** to `https://<your-app>.fly.dev` (no trailing slash) for Production, then redeploy the frontend so the URL is baked into the build.
+
+**Checks:** `curl https://<your-app>.fly.dev/live` → `ok`. `curl https://<your-app>.fly.dev/health` → JSON (may be **503** if Supabase is misconfigured—that is expected for the full health probe).
+
+**`Error: app not found`:** The `app = "..."` line in `backend/fly.toml` must be **exactly** the name shown by `fly apps list`. Edit that line to match, then deploy again. If you have no app yet, run `fly apps create <unique-name>` and set the same name in `fly.toml`. Secrets are per app—if you create a new app, run `fly secrets set ...` again for it.
+
+**Stuck on `Waiting for depot builder...`:** Cancel with Ctrl+C, then deploy **without** Depot (legacy remote builder):
+
+```bash
+fly deploy --depot=false
+```
+
+(from `backend/`, or `fly deploy ./backend --depot=false` from the repo root). If you prefer to build on your machine (requires [Docker](https://docs.docker.com/desktop/) running): `fly deploy --local-only`.
+
+---
+
 ## Summary
 
 | Use case | Recommendation |
 |----------|-----------------|
 | Personal / non-commercial | **Option A** – frontend + backend on Vercel free tier. |
-| Company internal | **Option B** with backend on your server (or Vercel Pro if you want backend on Vercel). |
+| Company internal | **Option B** with backend on **Fly.io** (see above), your server, or Vercel Pro if you want the API on Vercel. |
 | Full control / no vendor | Self-host frontend + backend on your server. |
 
 The repo includes a Vercel-ready setup (root `vercel.json` and `api/` handler) so you can try Option A with a single `vercel` deploy.

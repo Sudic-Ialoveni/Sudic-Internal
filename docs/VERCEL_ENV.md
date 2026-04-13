@@ -6,6 +6,18 @@ Replace placeholder values with your real ones.
 
 ---
 
+## Backend on Fly.io (recommended split)
+
+The browser loads the **Vercel** URL; API calls go to **Fly**. Set:
+
+| Name | Value |
+|------|--------|
+| `VITE_BACKEND_URL` | `https://YOUR-APP.fly.dev` (no trailing slash), e.g. `https://sudic-internal.fly.dev` |
+
+On **Fly**, `FRONTEND_URL` must be **exactly** your Vercel site URL (e.g. `https://sudic-internal.vercel.app`) so CORS allows the dashboard. Redeploy **Vercel** after changing `VITE_BACKEND_URL` so the new base URL is baked into the static build.
+
+---
+
 ## Your Vercel env vars (canonical list)
 
 - `AMOCRM_BASE_URL`
@@ -13,7 +25,7 @@ Replace placeholder values with your real ones.
 - `MOIZVONKI_API_KEY`
 - `MOIZVONKI_USER`
 - `MOIZVONKI_BASE_URL`
-- `VITE_BACKEND_URL` (e.g. `https://sudic-internal.vercel.app`)
+- `VITE_BACKEND_URL` — Fly API URL (split) **or** same as the Vercel URL if the API is served from the same Vercel project
 - `FRONTEND_URL` (e.g. `https://sudic-internal.vercel.app`)
 - `ANTHROPIC_API_KEY`
 - `CLAUDE_MODEL` (optional; defaults to `claude-sonnet-4-6`)
@@ -30,7 +42,7 @@ Replace placeholder values with your real ones.
 |------|--------|------|
 | `VITE_SUPABASE_URL` | `https://YOUR_PROJECT.supabase.co` | Same as in backend .env |
 | `VITE_SUPABASE_ANON_KEY` | your anon key | Same as in backend .env |
-| `VITE_BACKEND_URL` | `https://sudic-internal.vercel.app` | Must be this for same-origin API |
+| `VITE_BACKEND_URL` | `https://sudic-internal.fly.dev` or `https://sudic-internal.vercel.app` | **Fly:** your `*.fly.dev` API URL. **All-in-one Vercel:** same as the site URL for same-origin API |
 | `SUPABASE_URL` | `https://YOUR_PROJECT.supabase.co` | Same as above |
 | `SUPABASE_ANON_KEY` | your anon key | Same as above |
 | `SUPABASE_SERVICE_ROLE_KEY` | your service role key | From Supabase Dashboard → Settings → API |
@@ -61,7 +73,7 @@ Use this as a checklist. In Vercel, add each variable and paste your value.
 ```
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
-VITE_BACKEND_URL=https://sudic-internal.vercel.app
+VITE_BACKEND_URL=https://sudic-internal.fly.dev
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=

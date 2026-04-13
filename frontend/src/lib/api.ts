@@ -1,7 +1,8 @@
 import { supabase } from '@/lib/supabase/client'
 import { env } from '@/lib/env'
 
-const BASE_URL = env.VITE_BACKEND_URL
+/** No trailing slash — avoids `//api` when joining paths. */
+const BASE_URL = env.VITE_BACKEND_URL.replace(/\/$/, '')
 
 export type ApiError = { message: string; status: number }
 

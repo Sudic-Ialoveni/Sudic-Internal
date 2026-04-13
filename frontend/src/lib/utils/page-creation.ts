@@ -3,6 +3,7 @@
  * Useful for TaritiGPT integration and automated page generation.
  */
 
+import { apiUrl } from '@/lib/api'
 import { PageConfig, WidgetConfig, WidgetType } from '@/lib/types/widgets'
 
 export interface CreatePageOptions {
@@ -96,7 +97,7 @@ export async function createPageViaAPI(options: CreatePageOptions, authToken?: s
     throw new Error(`Invalid page config: ${validation.errors.join(', ')}`)
   }
 
-  const response = await fetch('/api/pages', {
+  const response = await fetch(apiUrl('/api/pages'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

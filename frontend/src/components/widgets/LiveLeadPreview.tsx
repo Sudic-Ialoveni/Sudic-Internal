@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase/client'
 import { Lead, LeadStatus } from '@/lib/types/leads'
 import { WidgetProps } from './WidgetRegistry'
 import { format } from 'date-fns'
+import { apiUrl } from '@/lib/api'
 
 interface LiveLeadPreviewSettings {
   initialFilter?: { status?: string; source?: string }
@@ -59,7 +60,7 @@ export default function LiveLeadPreview({ settings }: WidgetProps) {
       setActionLoading(id)
       const { supabase: sb } = await import('@/lib/supabase/client')
       const { data: { session } } = await sb.auth.getSession()
-      const res = await fetch(`/api/leads/${id}`, {
+      const res = await fetch(apiUrl(`/api/leads/${id}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
         body: JSON.stringify({ status }),
