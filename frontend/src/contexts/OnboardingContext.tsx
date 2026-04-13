@@ -54,9 +54,14 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   }, [refresh])
 
   const completeTour = useCallback(async () => {
-    await apiPatch('/api/user/preferences', { app_onboarding_completed: true })
-    setTourPending(false)
-    setTourRun(false)
+    try {
+      await apiPatch('/api/user/preferences', { app_onboarding_completed: true })
+      setTourPending(false)
+      setTourRun(false)
+    } catch (e) {
+      console.error('Could not save onboarding completion:', e)
+      // Keep tour state so the user can retry; refresh will still show the tour until PATCH succeeds.
+    }
   }, [])
 
   const resetTour = useCallback(async () => {

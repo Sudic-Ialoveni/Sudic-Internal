@@ -146,20 +146,31 @@ export default function AppOnboardingTour() {
     (data: CallBackProps) => {
       const { action, index, status, type } = data
 
+      const markComplete = () => {
+        if (finishOnce.current) return
+        finishOnce.current = true
+        void completeTour()
+      }
+
       if (status === STATUS.SKIPPED) {
         setTourRun(false)
         return
       }
 
+      // Some joyride builds emit this when the tour closes.
       if (status === STATUS.FINISHED) {
-        if (!finishOnce.current) {
-          finishOnce.current = true
-          void completeTour()
-        }
+        markComplete()
         return
       }
 
       if (type !== EVENTS.STEP_AFTER || action !== ACTIONS.NEXT) {
+        return
+      }
+
+      // Controlled mode: the last step's primary button ("Finish setup") sends NEXT on the final
+      // index — not STATUS.FINISHED — so we must persist here or the tour never completes.
+      if (index === LAST_INDEX) {
+        markComplete()
         return
       }
 
