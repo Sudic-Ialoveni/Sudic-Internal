@@ -17,6 +17,7 @@ import DevApiPage from './pages/dev/DevApiPage'
 import DevToolsTesterPage from './pages/dev/DevToolsTesterPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import EnvError from './components/EnvError'
+import SmallScreenBlock from './components/SmallScreenBlock'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null)
@@ -83,6 +84,7 @@ function App() {
 
   return (
     <ErrorBoundary>
+    <SmallScreenBlock />
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<OAuthCallback />} />
