@@ -4,9 +4,13 @@ import { useDeveloper } from '@/contexts/DeveloperContext'
 import { MessageBubble } from '@/components/chat/MessageBubble'
 import { UIMessage, UIBlock, ToolCallBlock, ApiMessage, SSEEvent } from '@/components/chat/types'
 import { apiMessagesToUIMessages } from '@/lib/chat/apiMessagesToUI'
-import { getToken, apiUrl } from '@/lib/api'
+import { apiFetch, getToken, apiUrl } from '@/lib/api'
 
 type ChatSummary = { id: string; title: string; updated_at: string }
+type UserApiPrefs = {
+  anthropic_api_key_configured?: boolean
+  openai_api_key_configured?: boolean
+}
 
 const INITIAL_MESSAGE: UIMessage = {
   id: 'intro',
@@ -96,6 +100,10 @@ export default function TaritiGPTPage({ shared = false }: { shared?: boolean }) 
   const [toast, setToast] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [hoveredChat, setHoveredChat] = useState<string | null>(null)
+  const [keysSetupModalOpen, setKeysSetupModalOpen] = useState(false)
+  const [keysCheckLoading, setKeysCheckLoading] = useState(false)
+  const [keysModalError, setKeysModalError] = useState<string | null>(null)
+  const [hasConfiguredApiKey, setHasConfiguredApiKey] = useState<boolean | null>(null)
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -360,8 +368,36 @@ export default function TaritiGPTPage({ shared = false }: { shared?: boolean }) 
     }
   }
 
+  async function ensureApiKeyConfigured(): Promise<boolean> {
+    if (shared) return true
+    if (hasConfiguredApiKey === true) return true
+
+    try {
+      setKeysCheckLoading(true)
+      setKeysModalError(null)
+      const data = await apiFetch<{ preferences?: UserApiPrefs }>('/api/user/preferences')
+      const hasAnyKey = Boolean(
+        data.preferences?.anthropic_api_key_configured || data.preferences?.openai_api_key_configured,
+      )
+      setHasConfiguredApiKey(hasAnyKey)
+      if (!hasAnyKey) {
+        setKeysSetupModalOpen(true)
+      }
+      return hasAnyKey
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not verify API key setup.'
+      setKeysModalError(msg)
+      setKeysSetupModalOpen(true)
+      return false
+    } finally {
+      setKeysCheckLoading(false)
+    }
+  }
+
   async function sendMessage(prompt: string) {
     if (!prompt.trim() || isStreaming || shared) return
+    const keysReady = await ensureApiKeyConfigured()
+    if (!keysReady) return
 
     setError(null)
     setInput('')
@@ -807,6 +843,58 @@ export default function TaritiGPTPage({ shared = false }: { shared?: boolean }) 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-slate-200 shadow-2xl animate-fade-in">
           {toast}
+        </div>
+      )}
+
+      {keysSetupModalOpen && (
+        <div className="fixed inset-0 z-[120000] bg-slate-950/95 backdrop-blur-sm">
+          <div className="mx-auto flex h-full max-w-2xl items-center justify-center p-6">
+            <div className="w-full rounded-2xl border border-indigo-500/30 bg-slate-900 p-7 shadow-2xl">
+              <p className="text-xs uppercase tracking-wide text-indigo-300">Setup required</p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">Add at least one API key</h2>
+              <p className="mt-3 text-sm text-slate-300">
+                Chat needs a configured provider key before sending messages. Add Anthropic or OpenAI in
+                <span className="text-indigo-200"> Settings → API keys &amp; model</span>.
+              </p>
+              {keysModalError && (
+                <p className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+                  {keysModalError}
+                </p>
+              )}
+              <div className="mt-6 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setKeysSetupModalOpen(false)
+                    navigate('/settings?tab=keys')
+                  }}
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
+                >
+                  Go to Settings
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setKeysSetupModalOpen(false)}
+                  className="rounded-lg border border-slate-600 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800"
+                >
+                  Ignore
+                </button>
+                <button
+                  type="button"
+                  disabled={keysCheckLoading}
+                  onClick={async () => {
+                    const ok = await ensureApiKeyConfigured()
+                    if (ok) {
+                      setKeysSetupModalOpen(false)
+                    }
+                  }}
+                  className="rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-4 py-2 text-sm text-indigo-200 hover:bg-indigo-500/20 disabled:opacity-60"
+                >
+                  {keysCheckLoading ? 'Checking…' : 'Check again'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
