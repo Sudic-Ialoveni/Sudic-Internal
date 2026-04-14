@@ -141,7 +141,7 @@ fly deploy --depot=false
 | Use case | Recommendation |
 |----------|-----------------|
 | Personal / non-commercial | **Option A** – frontend + backend on Vercel free tier. |
-| Company internal | **Option B** with backend on **Fly.io** (see above), your server, or Vercel Pro if you want the API on Vercel. |
+| Company internal | **Option B** with backend on **Coolify/homelab** (`docs/COOLIFY_BACKEND_DEPLOY.md`), or Vercel Pro if you want the API on Vercel. |
 | Full control / no vendor | Self-host frontend + backend on your server. |
 
 The repo includes a Vercel-ready setup (root `vercel.json` and `api/` handler) so you can try Option A with a single `vercel` deploy.

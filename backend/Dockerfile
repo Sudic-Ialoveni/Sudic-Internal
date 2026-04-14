@@ -7,8 +7,9 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install deps and build
+# Force devDependencies in builder even if NODE_ENV=production is injected at build time.
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --include=dev
 COPY build.mjs ./
 COPY src ./src
 COPY tsconfig.json ./
