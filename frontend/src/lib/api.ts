@@ -6,6 +6,16 @@ const BASE_URL = env.VITE_BACKEND_URL.replace(/\/$/, '')
 
 export type ApiError = { message: string; status: number }
 
+type BackendErrorEventDetail = {
+  status: number
+  path: string
+  message: string
+}
+
+function notifyBackendError(detail: BackendErrorEventDetail) {
+  window.dispatchEvent(new CustomEvent<BackendErrorEventDetail>('backend:request-error', { detail }))
+}
+
 async function getToken(): Promise<string | null> {
   const { data: { session } } = await supabase.auth.getSession()
   return session?.access_token ?? null
@@ -33,7 +43,17 @@ export async function apiFetch<T = unknown>(
     headers.set('Content-Type', 'application/json')
   }
 
-  const res = await fetch(url, { ...options, headers })
+  let res: Response
+  try {
+    res = await fetch(url, { ...options, headers })
+  } catch (err) {
+    notifyBackendError({
+      status: 0,
+      path,
+      message: err instanceof Error ? err.message : 'Network request failed',
+    })
+    throw err
+  }
 
   if (res.status === 401) {
     await supabase.auth.signOut()
@@ -45,6 +65,13 @@ export async function apiFetch<T = unknown>(
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: res.statusText }))
     const message = body?.error ?? body?.details ?? `HTTP ${res.status}`
+    if (res.status >= 500 || res.status === 429) {
+      notifyBackendError({
+        status: res.status,
+        path,
+        message: typeof message === 'string' ? message : JSON.stringify(message),
+      })
+    }
     throw Object.assign(new Error(typeof message === 'string' ? message : JSON.stringify(message)), {
       status: res.status,
     } as ApiError)

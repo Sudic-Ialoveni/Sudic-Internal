@@ -12,6 +12,11 @@ Use this when frontend stays on Vercel and backend runs in your homelab via Cool
 - Port: `3001`
 - Health check path: `/live` (always 200 when process is up)
 
+Important:
+
+- In Coolify "General", set exposed port to `3001` (not `3000`).
+- If Coolify shows `ports_exposes: 3000` while `PORT=3001`, you will get `502 Bad Gateway`.
+
 ## 2) Set environment variables in Coolify
 
 Copy from `backend/.env.example` and set at least:
@@ -22,6 +27,7 @@ Copy from `backend/.env.example` and set at least:
 - `FRONTEND_URL=https://sudic-internal.vercel.app` (or your exact frontend URL)
 - `PORT=3001`
 - `NODE_ENV=production`
+- `TRUST_PROXY=1`
 
 Build-time note (important for Coolify):
 

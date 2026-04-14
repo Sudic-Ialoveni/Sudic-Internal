@@ -24,7 +24,15 @@ import { createServiceClient } from './lib/supabase.js'
 export function createApp(): express.Express {
   const app = express()
 
-  if (process.env.FLY_APP_NAME) {
+  // Behind Fly/Coolify/other reverse proxies, req.ip is otherwise the proxy IP.
+  // That makes rate-limit treat all users as one client and quickly trigger 429.
+  const hasKnownProxyEnv = Boolean(
+    process.env.FLY_APP_NAME ||
+    process.env.COOLIFY_FQDN ||
+    process.env.COOLIFY_URL ||
+    process.env.TRUST_PROXY,
+  )
+  if (hasKnownProxyEnv || env.NODE_ENV === 'production') {
     app.set('trust proxy', 1)
   }
 
