@@ -1,0 +1,9 @@
+# Moizvonki API TUI Debugger — Python dependencies
+# Install with: pip install -r scripts/requirements_moizvonki_tui.txt
+
+# TUI framework (https://textual.textualize.io)
+# Tested with textual 8.x
+textual>=0.52.1
+
+# Optional: richer .env loading (the script has a built-in fallback parser)
+# python-dotenv>=1.0.0

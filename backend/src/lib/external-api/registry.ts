@@ -231,10 +231,10 @@ export const VARIABLE_REGISTRY: VariableDefinition[] = [
   // ---- Moizvonki static ----
   {
     id: 'moizvonki.calls_list',
-    description: 'List of calls from Moizvonki; optional from_date, to_date, max_results, supervised',
+    description: 'List of calls from Moizvonki; from_date (Unix ts) or from_id is required; optional to_date, max_results, supervised',
     source: 'moizvonki',
     entity: 'calls',
-    requiredParams: [],
+    requiredParams: ['from_date_or_from_id'],
     optionalParams: ['from_date', 'to_date', 'from_id', 'max_results', 'from_offset', 'supervised'],
     examplePath: 'moizvonki.calls_list',
     resolverKey: 'moizvonki.calls_list',
